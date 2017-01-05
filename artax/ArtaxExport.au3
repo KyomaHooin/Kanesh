@@ -49,14 +49,14 @@ While 1
 	global $atx,$pass,$err
 	$event = GUIGetMsg(); catch event
 	if $event = $button_path Then; data path
-		$project_path = FileSelectFolder("ArtaxHelper / Project directory", @HomeDrive, Default, $path_history)
+		$project_path = FileSelectFolder("ArtaxExport / Project directory", @HomeDrive, Default, $path_history)
 		if not @error then
 				GUICtrlSetData($gui_path, $project_path)
 				$path_history = $project_path; update last..
 		endif
 	EndIf
 	if $event = $button_exec Then; data path
-		$exec_path = FileOpenDialog("ArtaxHelper / Program file", @HomeDrive, "Artax program (*.exe)")
+		$exec_path = FileOpenDialog("ArtaxExport / Program file", @HomeDrive, "Artax program (*.exe)")
 		if not @error then
 				GUICtrlSetData($gui_exec, $exec_path)
 				$exec_history = $exec_path; update last..
