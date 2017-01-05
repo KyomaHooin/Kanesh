@@ -40,8 +40,8 @@ $button_export = GUICtrlCreateButton("Export", 188, 63, 75, 21)
 $button_exit = GUICtrlCreateButton("Konec", 270, 63, 75, 21)
 
 ;GUI INIT
-GUICtrlSetState($gui_path,$GUI_FOCUS)
-_GUICtrlEdit_SetSel($gui_path,-1,-1)
+GUICtrlSetState($button_exit,$GUI_FOCUS)
+;_GUICtrlEdit_SetSel($gui_path,-1,-1)
 
 GUISetState(@SW_SHOW)
 
