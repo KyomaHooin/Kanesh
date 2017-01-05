@@ -22,9 +22,7 @@ logger(@CRLF & "Program start: " & $runtime)
 DirCreate(@scriptdir & '\export')
 
 ;CONTROL
-
-;already running
-if UBound(ProcessList(@ScriptName)) > 2 then exit
+if UBound(ProcessList(@ScriptName)) > 2 then exit; already running
 
 ;GUI
 
@@ -40,23 +38,22 @@ $button_export = GUICtrlCreateButton("Export", 188, 63, 75, 21)
 $button_exit = GUICtrlCreateButton("Konec", 270, 63, 75, 21)
 
 ;GUI INIT
-GUICtrlSetState($button_exit,$GUI_FOCUS)
-;_GUICtrlEdit_SetSel($gui_path,-1,-1)
+GUICtrlSetState($button_export,$GUI_FOCUS)
 
 GUISetState(@SW_SHOW)
 
 While 1
-	global $atx,$pass,$err
+	global $atx,$atxchild,$pass,$err
 	$event = GUIGetMsg(); catch event
 	if $event = $button_path Then; data path
-		$project_path = FileSelectFolder("ArtaxExport / Project directory", @HomeDrive, Default, $path_history)
+		$project_path = FileOpenDialog("ArtaxExport / Project file", @HomeDrive, "Artax Project (*.rtx)")
 		if not @error then
 				GUICtrlSetData($gui_path, $project_path)
 				$path_history = $project_path; update last..
 		endif
 	EndIf
 	if $event = $button_exec Then; data path
-		$exec_path = FileOpenDialog("ArtaxExport / Program file", @HomeDrive, "Artax program (*.exe)")
+		$exec_path = FileOpenDialog("ArtaxExport/ Program file", @HomeDrive, "Artax program (*.exe)")
 		if not @error then
 				GUICtrlSetData($gui_exec, $exec_path)
 				$exec_history = $exec_path; update last..
@@ -72,30 +69,36 @@ While 1
 		elseif UBound(ProcessList('ARTAX.exe')) >= 2 then
 			GUICtrlSetData($gui_error, "Chyba: Ukoncete bezici program Artax.")
 		else
-			$project_list = _FileListToArray(GUICtrlRead($gui_path), '*.rtx', 1); files only..
-			if ubound($project_list) < 2 then
+			if not FileExists(GUICtrlRead($gui_path)) then
 				GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
 			else
 				run(GUICtrlRead($gui_exec)); run artax executable
 				$atx = WinWait('ARTAX','',5); ATX master
-				$pass = WinWait('Password','',5); Password prompt
+				WinSetState($atx,'',@SW_HIDE)
+				$pass = WinWait('Password','',5); password prompt
 				WinSetState($pass,'',@SW_HIDE)
 				WinActivate($pass)
 				Send('{ENTER}')
-				$err = WinWait('Error','',5); Error prompt
+				$err = WinWait('Error','',5); error prompt
+				WinSetState($err,'',@SW_HIDE)
 				WinActivate($err)
 				Send('{ENTER}')
-				;_ArrayDisplay(WinList())
-
-				;hide ATX master & child
-				;open project file
-				; send open -> get win -> pass file -> send open -> check win
+				Send('!fo')
+				Send(GuiCtrlRead($gui_path))
+				Send('!o')
+				Send('{TAB}{DOWN}')
+				sleep(3000); hold on a second!
+				Send('!{F4}')
+				Send('{DOWN}'); project
 				;loop measurement
-					;send skip info -> check name
+			;	Do
 					; send picture [shift] + C -> getclip -> save buff
 					; send graph    [crtl] + C -> getclip -> save buff
 					; send table    [crtl] + D -> getclip -> save buff
-				;exit program
+			;	until
+				sleep(5000)
+				WinClose($atx)
+				GUICtrlSetData($gui_error, "Hotovo!")
 			endif
 		endif
 	endif
