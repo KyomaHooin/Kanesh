@@ -1,4 +1,5 @@
 
+;"how to get image from clipboard without loss quality? -> @"
 
 ;MsgBox(Default,"test",StringRegExpReplace("ARTAX - [tabl_0@190916_145648]","^.*\[(.*)\]$","$1"))
 #include <Array.au3>
@@ -17,38 +18,93 @@ WinActivate("ARTAX -")
 ;sleep(5000)
 ;$text = _ClipBoard_GetData($CF_TEXT)
 Send('^c')
-$map = _ClipBoard_GetData($CF_METAFILEPICT)
+;$map = _ClipBoard_GetData($CF_METAFILEPICT)
 
-;MsgBox(Default,"map",$map)
+;if not _ClipBoard_IsFormatAvailable(3) then MsgBox(Default,"clip","Clipboard is available.")
+if not _ClipBoard_IsFormatAvailable(14) then MsgBox(Default,"clip","Clipboard is available.")
+_ClipBoard_Open(0); hook clipboard
+;$map = DllCall("user32.dll", "handle", "GetClipboardData", "uint", 3)
+;$map = DllCall("user32.dll", "handle", "GetClipboardData", "uint",14)
 
-;if $map = 0 then
+$map = _ClipBoard_GetDataEx(14)
+
+$type = _GDIPlus_ImageGetType($map)
+if @error then MsgBox(Default,"err","err: " & @extended)
+
+;$meta = DllStructCreate("LONG;LONG;LONG;ptr")
+;if @error then MsgBox(Default,"str","Failed to create struct!")
+
+;DllCall("user32.dll", "handle", "GetClipboardData", "uint",14)
+;if @error then MsgBox(Default,"str","Failed to get struct!")
+
+;$mm = DllStructGetData($meta,1)
+;if @error then MsgBox(Default,"str","Failed to get struct data!")
+
+;MsgBox(Default,"mm", $mm)
+
+;DllStructSetData($meta,$map)
+
+;if IsPtr($map[0]) then MsgBox(Default,"ptr", "Got ptr!: " & $map[0])
+
+;_WinAPI_GetEnhMetaFileBits( $mhf, $map[0])
+;if @error then MsgBox(Default,"emf","Failed!")
+
+;MsgBox(Default,"type",_GDIPlus_ImageGetType($map[0]))
+
+;_GDIPlus_Startup()
+;$hbitmap = _GDIPlus_BitmapCreateFromHBITMAP($map[0])
+;$hbitmap = _GDIPlus_BitmapCreateFromStream($map[0])
+;if @error then
+;	_ClipBoard_Close()
+;	_WinAPI_DeleteObject($hbitmap)
+;	_GDIPlus_Shutdown()
+;else
+;	MsgBox(Default,"bmp","Got bitmap!")
+;endif
+
+
+;$bmap = _GDIPlus_BitmapCreateFromStream
+;$bmap = _GDIPlus_
+
+;MsgBox(Default,"mem",$bmap)
+
+
+;if $map[0] = 0 then
 ;	_ClipBoard_Close()
 ;	MsgBox(Default,"mem","Empty ptr. " & $map)
 ;	Exit
 ;endif
 
-$buff = _MemGlobalLock($map)
-if $buff = 0 Then
-	_ClipBoard_Close()
-	MsgBox(Default,"mem","Empty buff.")
-	Exit
-endif
+;$buff = _MemGlobalLock($map[0])
 
-$buffsize = _MemGlobalSize($map)
-if $buff = 0 Then
-	_MemGlobalUnlock($map)
-	_ClipBoard_Close()
-	MsgBox(Default,"mem","Zero buff size.")
-	Exit
-endif
+;if $buff = 0 Then
+;	_ClipBoard_Close()
+;	MsgBox(Default,"mem","Empty buff.")
+;	Exit
+;endif
 
-$data = DllStructCreate("byte[" & $buffsize & "]", $buff)
-$ret = DllStructGetData($data, 1)
+; _WinAPI_S
 
-_MemGlobalUnlock($map)
-_ClipBoard_Close()
+;$mm = DllStructGetData($map[0],"mm")
+;if @error then MsgBox (Default,"Struct","Failed")
 
-MsgBox(Default,"data",$ret)
+;$buffsize = _MemGlobalSize($map[0])
+;if $buff = 0 Then
+;	_MemGlobalUnlock($map[0])
+;	_ClipBoard_Close()
+;	MsgBox(Default,"mem","Zero buff size.")
+;	Exit
+;endif
+
+;MsgBox(Default,"buff size", $buffsize)
+
+;$data = DllStructCreate("byte[" & $buffsize & "]", $buff)
+;$ret = DllStructGetData($data, 1)
+
+;_MemGlobalUnlock($map)
+;_ClipBoard_Close()
+
+;MsgBox(Default,"data",$ret)
 
 ;_MemRead($map)
 
