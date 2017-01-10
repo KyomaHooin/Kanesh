@@ -2,6 +2,10 @@
 ;
 ; TODO:
 ;
+; -WMT to EMF metafile.au3
+; -ATX child maximize
+; -EMF buffer to Image
+; -excel test
 ; -Excel export test
 ; -icon
 ; -remove tmp.emf (?)
