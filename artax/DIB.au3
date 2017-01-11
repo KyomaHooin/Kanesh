@@ -10,52 +10,58 @@ if @error then MsgBox(Default,"whnd","Failed.")
 ;paste an image from clipboard (bug in Clipboard.GetImage)
 
 WinActivate("ARTAX -")
-;Send('{RIGHT}{DOWN}')
-;$picture = WinWait("Picture",'',5)
+Send('{RIGHT}{DOWN}')
+$picture = WinWait("Picture",'',5)
 ;WinSetState($picture,'',@SW_HIDE)
-;WinActivate($picture)
-;WinWaitActive($picture,'',5)
-;MouseClick('right')
-Send('^c')
+WinActivate($picture)
+WinWaitActive($picture,'',5)
+MouseClick('right')
+Send('c')
 sleep(1000);Hold on a second!
 
 ;for $i = 1 to 17
 ;	if _ClipBoard_IsFormatAvailable($i) then MsgBox(Default,'format',$i); CF_BITMAP 2,8,17 BITMAP,DIB,DIBV5
 ;next
 
-if not _ClipBoard_IsFormatAvailable(3) then MsgBox(Default,'err',"Picture clip format err."); CF_DIB
-;if not _ClipBoard_IsFormatAvailable(17) then MsgBox(Default,'err',"Picture clip format err."); CF_DIBV5
+if not _ClipBoard_IsFormatAvailable(8) then MsgBox(Default,'err',"Picture clip format err."); CF_DIBV5
 
-$buff = _ClipBoard_GetData(3)
-;$buff = _ClipBoard_GetData(8)
+_ClipBoard_Open(0); hook clipboard
 
-;_ClipBoard_Open(0); hook clipboard
-;$BMP = _ClipBoard_GetDataEx(8); bitmap handle
-;if $BMP = 0 then MsgBox (Default,"err","DIB get ptr fail.")
-;local $block = _MemGlobalLock($BMP)
-;if $block = 0 then MsgBox(Default,"err","Failed to lock mem.")
-;local $size = _MemGlobalSize($block)
-;if $size = 0 then MsgBox(Default,"err","Failed to get size.")
+$DIB = _ClipBoard_GetDataEx(8); DIB handle
+if $DIB = 0 then MsgBox (Default,"err","DIB get fail.")
+local $PDIB = _MemGlobalLock($DIB);  DIB ptr
+if $PDIB = 0 then MsgBox(Default,"err","Failed to lock mem.")
+local $DIBSIZE = _MemGlobalSize($PDIB); DIB size
+if $DIBSIZE = 0 then MsgBox(Default,"err","Failed to get size.")
+
+$BITMAPINFOHEADER = DllStructCreate("DWORD;LONG;LONG;WORD;WORD;DWORD;DWORD;LONG;LONG;DWORD;DWORD[40]", $DIB); DIB strcuct
+if @error then MsgBox(Default,"err","BITMAPINFOHEADER struct fail.")
+
+local $strdata = ''
+
+for $i = 1 to 11
+	$strdata &= '  ' & DllStructGetData($BITMAPINFOHEADER,$i)
+Next
+MsgBox(Default,"str",$strdata)
+
+$BITMAPINFO = DllStructCreate("PTR;PTR", $DIB);BITMAPINFO struct -> BITMAPINFOHEADER + RGBQUAD
+if @error then MsgBox(Default,"err","BITMAPINFO struct failed.")
+
 ;$data = DllStructCreate("byte[" & $size & "]", $block)
 ;if @error then MsgBox(Default,"err","Data struct fail.")
+
 ;$buff = DllStructGetData($data,1)
 ;if @error then MsgBox(Default,"err","Struct data strem err.")
 ;_MemGlobalUnlock($block)
-;$f = FileOpen(@ScriptDir & '\tmp.dib',18); binary overwrite
+
+;$f = FileOpen(@ScriptDir & '\tmp.bmp',18); binary overwrite
 ;FileWrite($f,$buff)
 ;FileClose($f)
-
-
-$f = FileOpen(@ScriptDir & '\tmp.wmf',18); binary overwrite
-FileWrite($f,$buff)
-FileClose($f)
-
 
 ;_GDIPlus_Startup()
 ;Read EMF to image object
 ;$type = _GDIPlus_ImageLoadFromFile(@ScriptDir & '\tmp.dib')
 ;if @error then MsgBox(Default,"Ehmf","DIB fail.")
-
 
 ;_GDIPlus_Startup()
 ;_GDIPlus_BitmapCreateFrom
