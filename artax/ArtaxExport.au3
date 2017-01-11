@@ -2,17 +2,19 @@
 ;
 ; TODO:
 ;
-; -WMT to EMF metafile.au3
-; -ATX child maximize
-; -EMF buffer to Image
+; Win7/XP spectra name
+; table write clip error ignored
+; '.csv' no spectra err
+; WMT to EMF metafile.au3
+; ATX child maximize
+; EMF buffer to Image
 ; -excel test
-; -Excel export test
 ; -icon
 ; -remove tmp.emf (?)
 ; -_artax_getpicture
-; -get prolect files + loop
+; -get project files + loop
 ; -spectra loop
-; 
+;
 
 #AutoIt3Wrapper_Icon=artax.ico
 #NoTrayIcon
@@ -94,25 +96,38 @@ While 1
 				$pass = WinWait('Password','',5); password handle
 				WinSetState($pass,'',@SW_HIDE)
 				WinActivate($pass)
+				WinWaitActive($pass,'',5)
 				Send('{ENTER}')
 				$err = WinWait('Error','',5); conn error handle
+				WinSetState($err,'',@SW_HIDE)
+				WinActivate($err)
+				WinWaitActive($err,'',5)
 				WinClose($err)
-				$atx_child = WinWait('ARTAX -','',5); get ATX child handle
+				$atx_list = WinList("ARTAX")
+				for $i = 0 to UBound($atx_list) - 1
+					if $atx_list[$i][0] == 'ARTAX' and $atx_list[$i][1] <> $atx then $atx_child = $atx_list[$i][1]
+				next
+				;$atx_child = WinWait('ARTAX -','',5); get ATX child handle
 				; ---- project ----
 				WinActivate($atx_child)
 				Send('!fo')
+				WinWaitActive("Open Project",'',5)
 				Send(GuiCtrlRead($gui_path))
 				Send('!o')
 				Send('{TAB}{DOWN}')
-				$atx_proj = WinWait('Project Information','',5); get ATX child handle
-				WinClose($atx_proj)
+				$project = WinWait('Project Information','',5); get ATX child handle
+				WinSetState($project,'',@SW_HIDE)
+				WinActivate($project)
+				WinWaitActive($project,'',5)
+				WinClose($project)
 				Send('{DOWN}{DOWN}'); project
 				sleep(3000); Hold on a second!
-				$spectrum = StringRegExpReplace(WinGetTitle($atx_child),"^.*\[(.*)\]$","$1")
+;				$spectrum = StringRegExpReplace(WinGetTitle($atx_child),"^.*\[(.*)\]$","$1")
+				$spectrum = 'test'
 				DirCreate(@ScriptDir & '\export\' & $spectrum)
 				;---- table ----
-;				$table = _Artax_GetTable($spectrum)
-;				if @error then logger($table)
+				$table = _Artax_GetTable($spectrum)
+				if @error then logger($table)
 				;------- graph -----
 				$graph = _Artax_GetGraph($spectrum)
 				if @error then logger($graph)
@@ -123,6 +138,7 @@ While 1
 				WinClose($atx)
 				WinActivate($gui)
 				GUICtrlSetData($gui_error, "Hotovo!")
+				GUICtrlSetState($button_exit,$GUI_FOCUS)
 			endif
 		endif
 	endif
