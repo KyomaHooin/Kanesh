@@ -2,14 +2,13 @@
 ;
 ; TODO:
 ;
-; Win7/XP spectra name
+; WMF manual buff test..
+; Win7/XP spectra name [Document 1]
 ; table write clip error ignored
 ; '.csv' no spectra err
 ; WMT to EMF metafile.au3
-; ATX child maximize
 ; EMF buffer to Image
-; -excel test
-; -icon
+; -excel/PDF test
 ; -remove tmp.emf (?)
 ; -_artax_getpicture
 ; -get project files + loop
@@ -109,7 +108,9 @@ While 1
 				next
 				;$atx_child = WinWait('ARTAX -','',5); get ATX child handle
 				; ---- project ----
+				WinSetState($atx_child,'',@SW_MAXIMIZE)
 				WinActivate($atx_child)
+				WinWaitActive($atx_child,'',5)
 				Send('!fo')
 				WinWaitActive("Open Project",'',5)
 				Send(GuiCtrlRead($gui_path))
@@ -134,6 +135,8 @@ While 1
 				;---- picture ----
 				_Artax_GetPicture($spectrum)
 ;				BlockInput(0); unblock input
+				FileDelete(@ScriptDir & '\tmp.emf')
+;				if @error then MsgBox(Default,"err",@ScriptDir & '\tmp.emf' & " delete err: " & @error)
 				WinClose($atx_child)
 				WinClose($atx)
 				WinActivate($gui)
@@ -156,6 +159,7 @@ endfunc
 
 func _Artax_GetTable($spectrum)
 	Send('^d')
+	sleep(1000);Hold on a second!
 	$t = ClipGet()
 	if @error then return SetError(1,0,"Table get err: " & $spectrum)
 	$t_file = FileOpen(@ScriptDir & '\export\' & $spectrum & '\' & $spectrum & '.csv', 258); UTF-8 no BOM overwrite
@@ -205,7 +209,8 @@ func _Artax_GetGraph($spectrum)
 	if @error then SetError(1,0,"Graph PNG write err: " & $spectrum)
 	_GDIPlus_ImageDispose($image)
 	_GDIPlus_Shutdown()
-	FileDelete(@ScriptDir & '\tmp.emf')
+;	FileDelete(@ScriptDir & '\tmp.emf')
+;	if @error then MsgBox(Default,"err",@ScriptDir & '\tmp.emf' & " delete err: " & @error)
 EndFunc
 
 func _Artax_GetPicture($spectrum)
