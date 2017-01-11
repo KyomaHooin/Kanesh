@@ -27,36 +27,47 @@ if not _ClipBoard_IsFormatAvailable(8) then MsgBox(Default,'err',"Picture clip f
 
 _ClipBoard_Open(0); hook clipboard
 
-$DIB = _ClipBoard_GetDataEx(8); DIB handle
-if $DIB = 0 then MsgBox (Default,"err","DIB get fail.")
+$HDIB = _ClipBoard_GetDataEx(8); DIB handle
+if $HDIB = 0 then MsgBox (Default,"err","DIB get fail.")
 local $PDIB = _MemGlobalLock($DIB);  DIB ptr
 if $PDIB = 0 then MsgBox(Default,"err","Failed to lock mem.")
 local $DIBSIZE = _MemGlobalSize($PDIB); DIB size
 if $DIBSIZE = 0 then MsgBox(Default,"err","Failed to get size.")
 
-$BITMAPINFOHEADER = DllStructCreate("DWORD;LONG;LONG;WORD;WORD;DWORD;DWORD;LONG;LONG;DWORD;DWORD[40]", $DIB); DIB strcuct
+$BITMAPINFOHEADER = DllStructCreate("DWORD;LONG;LONG;WORD;WORD;DWORD;DWORD;LONG;LONG;DWORD;DWORD", $DIB); DIB strcuct
 if @error then MsgBox(Default,"err","BITMAPINFOHEADER struct fail.")
 
-local $strdata = ''
+;local $strdata = ''
+;for $i = 1 to 11
+;	$strdata &= '  ' & DllStructGetData($BITMAPINFOHEADER,$i)
+;Next
+;MsgBox(Default,"str",$strdata)
 
-for $i = 1 to 11
-	$strdata &= '  ' & DllStructGetData($BITMAPINFOHEADER,$i)
-Next
-MsgBox(Default,"str",$strdata)
+;$BITMAPINFO = DllStructCreate("PTR;PTR", $DIB);BITMAPINFO struct -> BITMAPINFOHEADER + RGBQUAD
+;if @error then MsgBox(Default,"err","BITMAPINFO struct failed.")
 
-$BITMAPINFO = DllStructCreate("PTR;PTR", $DIB);BITMAPINFO struct -> BITMAPINFOHEADER + RGBQUAD
+$HEADER = DllStructCreate("WORD;UINT;UINT:UINT");BMP HEADER
 if @error then MsgBox(Default,"err","BITMAPINFO struct failed.")
 
-;$data = DllStructCreate("byte[" & $size & "]", $block)
-;if @error then MsgBox(Default,"err","Data struct fail.")
+DllStructSetData($HEADER,1,0x4d42)
+DllStructSetData($HEADER,2, 54 + DllStructGetData($BITMAPINFOHEADER,7)); SizeImage
+DllStructSetData($HEADER,3, 0)
+DllStructSetData($HEADER,4, 54); 14(BMP HEADER) + 40(BITMAPINFOHEADER)
+
+$DIB = DllStructCreate("byte[" & $DIBSIZE & "]", $PDIB)
+if @error then MsgBox(Default,"err","DIP buff fail.")
 
 ;$buff = DllStructGetData($data,1)
 ;if @error then MsgBox(Default,"err","Struct data strem err.")
 ;_MemGlobalUnlock($block)
 
-;$f = FileOpen(@ScriptDir & '\tmp.bmp',18); binary overwrite
-;FileWrite($f,$buff)
-;FileClose($f)
+$BMP = FileOpen(@ScriptDir & '\tmp.bmp',17); binary append
+FileWrite($BMP,DllStructGetData($HEADER,1))
+FileWrite($BMP,DllStructGetData($HEADER,2))
+FileWrite($BMP,DllStructGetData($HEADER,3))
+FileWrite($BMP,DllStructGetData($HEADER,4))
+FileWrite($BMP,DllStructGetData($DIB,1))
+FileClose($BMP)
 
 ;_GDIPlus_Startup()
 ;Read EMF to image object
