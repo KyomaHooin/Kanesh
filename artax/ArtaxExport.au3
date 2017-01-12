@@ -2,15 +2,11 @@
 ;
 ; TODO:
 ;
-; WMF manual buff test..
+; -excel test
 ; Win7/XP spectra name [Document 1]
 ; table write clip error ignored
-; '.csv' no spectra err
-; WMT to EMF metafile.au3
-; EMF buffer to Image
-; -excel/PDF test
-; -remove tmp.emf (?)
-; -_artax_getpicture
+; EMF/DIP buffer to Image
+; -remove tmp.*(
 ; -get project files + loop
 ; -spectra loop
 ;
@@ -20,10 +16,7 @@
 
 #include <GUIConstantsEx.au3>
 #include <GUIComboBox.au3>
-#include <Clipboard.au3>
-#include <WinAPISys.au3>
-#include <WinAPIGdi.au3>
-#include <GDIPlus.au3>
+#include <ArtaxHelper.au3>
 
 $runtime = @YEAR & @MON & @MDAY & 'T' & @HOUR & @MIN & @SEC
 $log = @scriptdir & '\ArtaxExport.log'
@@ -127,18 +120,32 @@ While 1
 				$spectrum = 'test'
 				DirCreate(@ScriptDir & '\export\' & $spectrum)
 				;---- table ----
-				$table = _Artax_GetTable($spectrum)
+				Send('^d')
+				sleep(1000);Hold on a second!
+				$table = _Artax_GetTableEx($spectrum)
 				if @error then logger($table)
 				;------- graph -----
-				$graph = _Artax_GetGraph($spectrum)
+				Send('^c')
+				sleep(1000);Hold on a second!
+				$graph = _Artax_GetGraphEx($spectrum)
 				if @error then logger($graph)
 				;---- picture ----
-				_Artax_GetPicture($spectrum)
+				Send('{RIGHT}{DOWN}')
+				$atx_picture = WinWait("Picture",'',5)
+				WinActivate($atx_picture)
+				WinWaitActive($atx_picture,'',5)
+				MouseClick('right')
+				Send('c')
+				sleep(1000);Hold on a second!
+				$picture = _Artax_GetPictureEx($spectrum)
+				if @error then logger($picture)
+				WinClose($atx_picture)
+				Send('{DOWN}')
+				;----- cleanup ----
 ;				BlockInput(0); unblock input
-				FileDelete(@ScriptDir & '\tmp.emf')
-;				if @error then MsgBox(Default,"err",@ScriptDir & '\tmp.emf' & " delete err: " & @error)
-				WinClose($atx_child)
-				WinClose($atx)
+				FileDelete(@ScriptDir & '\tmp.*')
+;				WinClose($atx_child)
+;				WinClose($atx)
 				WinActivate($gui)
 				GUICtrlSetData($gui_error, "Hotovo!")
 				GUICtrlSetState($button_exit,$GUI_FOCUS)
@@ -156,71 +163,3 @@ WEnd
 func logger($text)
 	FileWriteLine($logfile, $text)
 endfunc
-
-func _Artax_GetTable($spectrum)
-	Send('^d')
-	sleep(1000);Hold on a second!
-	$t = ClipGet()
-	if @error then return SetError(1,0,"Table get err: " & $spectrum)
-	$t_file = FileOpen(@ScriptDir & '\export\' & $spectrum & '\' & $spectrum & '.csv', 258); UTF-8 no BOM overwrite
-	FileWrite($t_file, $t)
-	if @error then return SetError(1,0,"Table write err: " & $spectrum)
-	FileClose($t_file)
-EndFunc
-
-func _Artax_GetGraph($spectrum)
-	Send('^c')
-	sleep(1000);Hold on a second!
-	if not _ClipBoard_IsFormatAvailable(3) then return SetError(1,0,"Graph clip format err: " & $spectrum); CF_METAFILEPICT
-	_ClipBoard_Open(0); hook clipboard
-	if @error then return SetError(1,0,"Graph clip lock err: " & $spectrum)
-	$MFP = _ClipBoard_GetDataEx(3); clipboard METAFILEPICT struct ptr
-	if $MFP = 0 then return SetError(1,0,"Graph METAFILEPICT struct ptr err: " & $spectrum)
-	$SMFP = DllStructCreate("LONG;LONG;LONG;HANDLE", $MFP); clipboard METAFILEPICT struct
-	if @error then return SetError(1,0,"Graph METAFILE struct err: " & $spectrum)
-	$HWMF = DllStructGetData($SMFP, 4);METAFILE handle ptr
-	if $HWMF = 0 then return SetError(1,0,"Graph METAFILE handle ptr err: " & $spectrum)
-	$WMFBUFFSIZE = DllCall('gdi32.dll', "uint", "GetMetaFileBitsEx", "handle", $HWMF, "int", 0, "ptr", null); buffer size in bytes
-	if $WMFBUFFSIZE = 0 then return SetError(1,0,"Graph WMF buffer size err: " & $spectrum)
-	$WMF = DllStructCreate('byte[' & $WMFBUFFSIZE[0] & ']')
-	if @error then return SetError(1,0,"Graph WMF struct err: " & $spectrum)
-	$PWMF = DllStructGetPtr($WMF)
-	if @error then return SetError(1,0,"Graph WMF struct ptr err: " & $spectrum)
-	$WMFBYTES = DllCall('gdi32.dll', "uint", "GetMetaFileBitsEx", "handle", $HWMF, "int", $WMFBUFFSIZE[0], "ptr", $PWMF)
-	if $WMFBYTES = 0 then SetError(1,0,"Graph WMF buffer err: " & $spectrum)
-	$HEMF = DllCall('gdi32.dll', "handle", "SetWinMetaFileBits", "int", $WMFBUFFSIZE[0], "ptr", $PWMF, "handle", null, "handle", null)
-	if $HEMF = Null then SetError(1,0,"Graph WMF buffer to HEMF handle err: " & $spectrum)
-	$PEMF = _WinAPI_CreateBuffer($WMFBUFFSIZE[0])
-	if $PEMF = 0 then SetError(1,0,"Graph EMF buffer pointer err: " & $spectrum)
-	$EMFBYTES = _WinAPI_GetEnhMetaFileBits($HEMF[0],$PEMF)
-	if $EMFBYTES = 0 then SetError(1,0,"Graph EMF buffer size err: " & $spectrum)
-	$EMF = _WinAPI_SetEnhMetaFileBits($PEMF,$EMFBYTES)
-	if $EMF then SetError(1,0,"Graph EMF err: " & $spectrum)
-	$FEMF = _WinAPI_CopyEnhMetaFile($EMF, @ScriptDir & '\tmp.emf')
-	if $FEMF = 0 then SetError(1,0,"Graph EMF write err: " & $spectrum)
-	_WinAPI_FreeMemory($PEMF)
-	_WinAPI_DeleteEnhMetaFile($EMF)
-	_GDIPlus_Startup()
-	$image = _GDIPlus_ImageLoadFromFile(@ScriptDir & '\tmp.emf')
-	if $image = 0 then SetError(1,0,"Graph Image read err: " & $spectrum)
-	$encoder = _GDIPlus_EncodersGetCLSID("PNG")
-	if @error then SetError(1,0,"Graph PNG encoder err: " & $spectrum)
-	_GDIPlus_ImageSaveToFileEx($image, @ScriptDir & '\export\' & $spectrum & '\' & $spectrum & '.png', $encoder)
-	if @error then SetError(1,0,"Graph PNG write err: " & $spectrum)
-	_GDIPlus_ImageDispose($image)
-	_GDIPlus_Shutdown()
-;	FileDelete(@ScriptDir & '\tmp.emf')
-;	if @error then MsgBox(Default,"err",@ScriptDir & '\tmp.emf' & " delete err: " & @error)
-EndFunc
-
-func _Artax_GetPicture($spectrum)
-	;Send('{RIGHT}')
-	;Send('{DOWN}')
-	;sleep(1000);Hold on a sec.!
-	;$pic = WinGetHandle("Picture")
-	;WinActivate($pic)
-	;MouseClick("right")
-	;Send('c')
-	;$map = _ClipBoard_GetData($CF_BTIMAP)
-	return
-EndFunc
