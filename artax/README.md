@@ -1,12 +1,13 @@
 
 DESCRIPTION
 
-Bruker Artax 400 XRF spectrometre xport helper.
+Bruker "Artax 400" XRF spectrometer data export wrapper.
 
 FILE
 
 <pre>
-ArtaxHelper.au3 - Main program.
+ArtaxExport.au3 - Main program
+ArtaxHelper.au3 - Helper clipboard functions.
       artax.ico - Program icon. 
 </pre>
 
