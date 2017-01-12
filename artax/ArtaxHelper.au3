@@ -1,8 +1,20 @@
+;
+; Helper clipboard data extraction function for Bruker Artax 400 binary program.
+;
+; _Artax_GetTableEx ......... Clipboard CF_TEXT to CSV file.
+; _Artax_GetPictureEx ....... Convert clipboard CF_DIB to BITMAP encoded to PNG file.
+; _Artax_GetGraphEx ......... Convert clipboard CF_METAFILEPICT WMF to EMF encoded to PNG file.
+;
+;----------------------------
 
 #include <Clipboard.au3>
 #include <WinAPISys.au3>
 #include <WinAPIGdi.au3>
 #include <GDIPlus.au3>
+
+;
+; Get CSV from TEXT clipboard.
+;
 
 Func _Artax_GetTableEx($spectrum,$export)
 	if not _ClipBoard_IsFormatAvailable(1) then MsgBox(Default,'err',"Table clip format err." & $spectrum); CF_DIBV5
@@ -17,6 +29,10 @@ Func _Artax_GetTableEx($spectrum,$export)
 
 	_ClipBoard_Close()
 EndFunc
+
+;
+; Get PNG image from DIB clipboard.
+;
 
 Func _Artax_GetPictureEx($spectrum,$export)
 	if not _ClipBoard_IsFormatAvailable(8) then return SetError(1,0,"Picture clip format err: " & $spectrum); CF_DIBV5
@@ -72,6 +88,10 @@ Func _Artax_GetPictureEx($spectrum,$export)
 
 	_ClipBoard_Close()
 EndFunc
+
+;
+; Get PNG image from WMF clipboard.
+;
 
 Func _Artax_GetGraphEx($spectrum,$export)
 	if not _ClipBoard_IsFormatAvailable(3) then return SetError(1,0,"Graph clip format err: " & $spectrum); CF_METAFILEPICT
@@ -132,3 +152,4 @@ Func _Artax_GetGraphEx($spectrum,$export)
 
 	_ClipBoard_Close()
 EndFunc
+

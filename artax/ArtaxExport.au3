@@ -1,4 +1,5 @@
-
+;
+; Bruker Artax 400 spectrometer data export wrapper by Richard Bruna
 ;
 ; TODO:
 ;
