@@ -1,7 +1,7 @@
 
 DESCRIPTION
 
-Bruker Artax 400 project data export helper.
+Bruker Artax 400 XRF spectrometre xport helper.
 
 FILE
 
