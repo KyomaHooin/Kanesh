@@ -4,20 +4,21 @@
 #include <WinAPIGdi.au3>
 #include <GDIPlus.au3>
 
-Func _Artax_GetTableEx($spectrum)
+Func _Artax_GetTableEx($spectrum,$export)
 	if not _ClipBoard_IsFormatAvailable(1) then MsgBox(Default,'err',"Table clip format err." & $spectrum); CF_DIBV5
 
 	$TEXT = ClipGet()
 	if @error then return SetError(1,0,"Table get err: " & $spectrum)
-	$tab = FileOpen(@ScriptDir & '\export\' & $spectrum & '\' & $spectrum & '.csv', 258); UTF-8 no BOM overwrite
+	$tab = FileOpen($export & '\' & $spectrum & '.csv', 258); UTF-8 no BOM overwrite
+	if @error then return SetError(1,0,"Table file open err: " & $spectrum)
 	FileWrite($tab, $TEXT)
-	if @error then return SetError(1,0,"Table write err: " & $spectrum)
+	if @error then return SetError(1,0,"Table file write err: " & $spectrum)
 	FileClose($tab)
 
 	_ClipBoard_Close()
 EndFunc
 
-Func _Artax_GetPictureEx($spectrum)
+Func _Artax_GetPictureEx($spectrum,$export)
 	if not _ClipBoard_IsFormatAvailable(8) then return SetError(1,0,"Picture clip format err: " & $spectrum); CF_DIBV5
 
 	_ClipBoard_Open(0); hook clipboard
@@ -64,7 +65,7 @@ Func _Artax_GetPictureEx($spectrum)
 	if @error then return SetError(1,0,"Picture Image read err: " & $spectrum)
 	$encoder = _GDIPlus_EncodersGetCLSID("PNG")
 	if @error then return SetError(1,0,"Picture PNG encoder err: " & $spectrum)
-	_GDIPlus_ImageSaveToFileEx($bitmap, @ScriptDir & '\export\' & $spectrum & '\' & $spectrum & '_picture.png', $encoder)
+	_GDIPlus_ImageSaveToFileEx($bitmap, $export & '\' & $spectrum & '_picture.png', $encoder)
 	if @error then return SetError(1,0,"Picture PNG write err: " & $spectrum)
 	_GDIPlus_ImageDispose($bitmap)
 	_GDIPlus_Shutdown()
@@ -72,7 +73,7 @@ Func _Artax_GetPictureEx($spectrum)
 	_ClipBoard_Close()
 EndFunc
 
-Func _Artax_GetGraphEx($spectrum)
+Func _Artax_GetGraphEx($spectrum,$export)
 	if not _ClipBoard_IsFormatAvailable(3) then return SetError(1,0,"Graph clip format err: " & $spectrum); CF_METAFILEPICT
 
 	_ClipBoard_Open(0); hook clipboard
@@ -124,7 +125,7 @@ Func _Artax_GetGraphEx($spectrum)
 	if $image = 0 then SetError(1,0,"Graph Image read err: " & $spectrum)
 	$encoder = _GDIPlus_EncodersGetCLSID("PNG")
 	if @error then SetError(1,0,"Graph PNG encoder err: " & $spectrum)
-	_GDIPlus_ImageSaveToFileEx($image, @ScriptDir & '\export\' & $spectrum & '\' & $spectrum & '_graph.png', $encoder)
+	_GDIPlus_ImageSaveToFileEx($image, $export & '\' & $spectrum & '_graph.png', $encoder)
 	if @error then SetError(1,0,"Graph PNG write err: " & $spectrum)
 	_GDIPlus_ImageDispose($image)
 	_GDIPlus_Shutdown()
