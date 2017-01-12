@@ -3,12 +3,8 @@
 ; TODO:
 ;
 ; -excel test
-; Win7/XP spectra name [Document 1]
-; table write clip error ignored
 ; EMF/DIP buffer to Image
-; -remove tmp.*(
-; -get project files + loop
-; -spectra loop
+; -remove tmp.* -> no overwrite(!)
 ;
 
 #AutoIt3Wrapper_Icon=artax.ico
@@ -17,6 +13,7 @@
 #include <GUIConstantsEx.au3>
 #include <GUIComboBox.au3>
 #include <ArtaxHelper.au3>
+#include <File.au3>
 
 $runtime = @YEAR & @MON & @MDAY & 'T' & @HOUR & @MIN & @SEC
 $log = @scriptdir & '\ArtaxExport.log'
@@ -37,7 +34,7 @@ if UBound(ProcessList(@ScriptName)) > 2 then exit; already running
 
 ;GUI
 
-$gui = GUICreate("ArtaxExport v 1.3", 351, 91)
+$gui = GUICreate("ArtaxExport v 1.4", 351, 91)
 $label_path = GUICtrlCreateLabel("Projekt:", 6, 10, 35, 21)
 $gui_path = GUICtrlCreateInput($path_history, 46, 8, 217, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
@@ -57,8 +54,8 @@ While 1
 	global $atx,$pass,$err,$atx_child
 	$event = GUIGetMsg(); catch event
 	if $event = $button_path Then; data path
-		$project_path = FileOpenDialog("ArtaxExport / Project file", @HomeDrive, "Artax Project (*.rtx)")
-		if not @error then
+		$project_path = FileSelectFolder("ArtaxExport / Project directory", @HomeDrive)
+		if $project_path then
 				GUICtrlSetData($gui_path, $project_path)
 				$path_history = $project_path; update last..
 		endif
@@ -77,11 +74,14 @@ While 1
 			GUICtrlSetData($gui_error, "Chyba: Program neexistuje.")
 		elseif UBound(ProcessList('ARTAX.exe')) >= 2 then
 			GUICtrlSetData($gui_error, "Chyba: Ukoncete bezici program.")
+		elseif not FileExists(GUICtrlRead($gui_path)) then
+				GUICtrlSetData($gui_error, "Chyba: Adresar neexistuje.")
 		else
-			if not FileExists(GUICtrlRead($gui_path)) then
+			$project_list = _FileListToArray(GUICtrlRead($gui_path),"*.rtx",1, True)
+			if UBound($project_list) < 2 then
 				GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
 			else
-;				BlockInput(1); block input
+				; ---- ATX ----
 				run(GUICtrlRead($gui_exec)); run artax executable
 				$atx = WinWait('ARTAX','',5); ATX handle
 				WinSetState($atx,'',@SW_HIDE)
@@ -96,60 +96,79 @@ While 1
 				WinWaitActive($err,'',5)
 				WinClose($err)
 				$atx_list = WinList("ARTAX")
-				for $i = 0 to UBound($atx_list) - 1
+				for $i = 0 to UBound($atx_list) - 1;get ATX child
 					if $atx_list[$i][0] == 'ARTAX' and $atx_list[$i][1] <> $atx then $atx_child = $atx_list[$i][1]
 				next
-				;$atx_child = WinWait('ARTAX -','',5); get ATX child handle
-				; ---- project ----
-				WinSetState($atx_child,'',@SW_MAXIMIZE)
-				WinActivate($atx_child)
-				WinWaitActive($atx_child,'',5)
-				Send('!fo')
-				WinWaitActive("Open Project",'',5)
-				Send(GuiCtrlRead($gui_path))
-				Send('!o')
-				Send('{TAB}{DOWN}')
-				$project = WinWait('Project Information','',5); get ATX child handle
-				WinSetState($project,'',@SW_HIDE)
-				WinActivate($project)
-				WinWaitActive($project,'',5)
-				WinClose($project)
-				Send('{DOWN}{DOWN}'); project
-				sleep(3000); Hold on a second!
-;				$spectrum = StringRegExpReplace(WinGetTitle($atx_child),"^.*\[(.*)\]$","$1")
-				$spectrum = 'test'
-				DirCreate(@ScriptDir & '\export\' & $spectrum)
-				;---- table ----
-				Send('^d')
-				sleep(1000);Hold on a second!
-				$table = _Artax_GetTableEx($spectrum)
-				if @error then logger($table)
-				;------- graph -----
-				Send('^c')
-				sleep(1000);Hold on a second!
-				$graph = _Artax_GetGraphEx($spectrum)
-				if @error then logger($graph)
-				;---- picture ----
-				Send('{RIGHT}{DOWN}')
-				$atx_picture = WinWait("Picture",'',5)
-				WinActivate($atx_picture)
-				WinWaitActive($atx_picture,'',5)
-				MouseClick('right')
-				Send('c')
-				sleep(1000);Hold on a second!
-				$picture = _Artax_GetPictureEx($spectrum)
-				if @error then logger($picture)
-				WinClose($atx_picture)
-				Send('{DOWN}')
+				for $i = 1 to UBound($project_list) - 1
+					; ---- open project ----
+					WinSetState($atx_child,'',@SW_MAXIMIZE)
+					WinActivate($atx_child)
+					WinWaitActive($atx_child,'',5)
+					Send('!fo')
+					WinWaitActive("Open Project",'',5)
+					Send($project_list[$i])
+					Send('!o')
+					; ---- project ----
+					Send('{TAB}{DOWN}')
+					$project_info = WinWait('Project Information','',5); get ATX child handle
+					WinSetState($project_info,'',@SW_HIDE)
+					WinActivate($project_info)
+					WinWaitActive($project_info,'',5)
+					WinClose($project_info)
+					Send('{DOWN}')
+					;---- spectra ----
+					$spectra_prev = ''
+					while 1
+						Send('{DOWN}')
+						Switch @OSVersion
+							Case 'WIN_XP'
+								sleep(5000); Hold on a second!
+								$spectra_next = StringRegExpReplace(WinGetTitle($atx_child),"^.*\[(.*)\]$","$1"); Win XP
+							case 'WIN_7','WIN_8','WIN_81','WIN_10'
+								$spectra_next = 'test'
+							case Else
+								logger("Unsupported OS version.")
+								ExitLoop
+						EndSwitch
+						if $spectra_next <> $spectra_prev then
+							DirCreate(@ScriptDir & '\export\' & $spectra_next)
+							;---- table ----
+							Send('^d')
+							sleep(1000);Hold on a second!
+							$table = _Artax_GetTableEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
+							if @error then logger($table)
+							;------- graph -----
+							Send('^c')
+							sleep(1000);Hold on a second!
+							$graph = _Artax_GetGraphEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
+							if @error then logger($graph)
+							;---- picture ----
+							Send('{RIGHT}{DOWN}')
+							$atx_picture = WinWait("Picture",'',5)
+							WinActivate($atx_picture)
+							WinWaitActive($atx_picture,'',5)
+							MouseClick('right')
+							Send('c')
+							sleep(1000);Hold on a second!
+							$picture = _Artax_GetPictureEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
+							if @error then logger($picture)
+							WinClose($atx_picture)
+							; ---- update ----
+							$spectra_prev = $spectra_next
+						else
+							logger("No project spectra left: " & $project_list[$i])
+							ExitLoop
+						endif
+					wend
+				next
 				;----- cleanup ----
-;				BlockInput(0); unblock input
 				FileDelete(@ScriptDir & '\tmp.*')
-;				WinClose($atx_child)
-;				WinClose($atx)
-				WinActivate($gui)
-				GUICtrlSetData($gui_error, "Hotovo!")
-				GUICtrlSetState($button_exit,$GUI_FOCUS)
+				WinClose($atx_child)
+				WinClose($atx)
 			endif
+			WinActivate($gui)
+			GUICtrlSetData($gui_error, "Done!")
+			GUICtrlSetState($button_exit,$GUI_FOCUS)
 		endif
 	endif
 	If $event = $GUI_EVENT_CLOSE or $event = $button_exit then
@@ -163,3 +182,4 @@ WEnd
 func logger($text)
 	FileWriteLine($logfile, $text)
 endfunc
+
