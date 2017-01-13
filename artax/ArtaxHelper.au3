@@ -2,14 +2,12 @@
 ; Helper clipboard data extraction function for Bruker Artax 400 binary program.
 ;
 ; _Artax_GetTableEx ......... Clipboard CF_TEXT to CSV file.
-; _Artax_GetPictureEx ....... Convert clipboard CF_DIB to BITMAP encoded to PNG file.
-; _Artax_GetGraphEx ......... Convert clipboard CF_METAFILEPICT WMF to EMF encoded to PNG file.
+; _Artax_GetPictureEx ....... Convert clipboard CF_DIB to BITMAP, encoded to PNG file.
+; _Artax_GetGraphEx ......... Convert clipboard CF_METAFILEPICT WMF to EMF, encoded to PNG file.
 ;
 ;----------------------------
 
 #include <Clipboard.au3>
-#include <WinAPISys.au3>
-#include <WinAPIGdi.au3>
 #include <GDIPlus.au3>
 
 ;
@@ -60,24 +58,20 @@ Func _Artax_GetPictureEx($spectrum,$export)
 	$DIB = DllStructCreate("byte[" & $DIBSIZE & "]", $PDIB); $ DB struct
 	if @error then return SetError(1,0,"Picture DIB struct err: " & $spectrum)
 
-	_MemGlobalUnlock($PDIB)
+	$buffer = 	DllStructGetData($HEADER,1) & _
+				DllStructGetData($HEADER,2) & _
+				DllStructGetData($HEADER,3) & _
+				DllStructGetData($HEADER,4) & _
+				DllStructGetData($DIB,1)
+	if @error then return SetError(1,0,"Picture MBF buffer err: " & $spectrum)
 
-	$BMP = FileOpen(@ScriptDir & '\tmp.bmp',18); binary overwrite
-	if @error then return SetError(1,0,"Picture BMP file open err: " & $spectrum)
-	FileWrite($BMP,DllStructGetData($HEADER,1))
-	if @error then return SetError(1,0,"Picture BMP file write err: " & $spectrum)
-	FileWrite($BMP,DllStructGetData($HEADER,2))
-	if @error then return SetError(1,0,"Picture BMP file write err: " & $spectrum)
-	FileWrite($BMP,DllStructGetData($HEADER,3))
-	if @error then return SetError(1,0,"Picture BMP file write err: " & $spectrum)
-	FileWrite($BMP,DllStructGetData($HEADER,4))
-	if @error then return SetError(1,0,"Picture BMP file write err: " & $spectrum)
-	FileWrite($BMP,DllStructGetData($DIB,1))
-	if @error then return SetError(1,0,"Picture BMP file write err: " & $spectrum)
-	FileClose($BMP)
+	_MemGlobalUnlock($PDIB)
+	_MemGlobalFree($PDIB)
+
+	$DIB = 0;free DIB struct
 
 	_GDIPlus_Startup()
-	$bitmap = _GDIPlus_ImageLoadFromFile(@ScriptDir & '\tmp.bmp')
+	$bitmap = _GDIPlus_BitmapCreateFromMemory($buffer)
 	if @error then return SetError(1,0,"Picture Image read err: " & $spectrum)
 	$encoder = _GDIPlus_EncodersGetCLSID("PNG")
 	if @error then return SetError(1,0,"Picture PNG encoder err: " & $spectrum)
@@ -102,47 +96,49 @@ Func _Artax_GetGraphEx($spectrum,$export)
 	$MFP = _ClipBoard_GetDataEx(3); clipboard METAFILEPICT struct ptr
 	if $MFP = 0 then return SetError(1,0,"Graph METAFILEPICT struct ptr err: " & $spectrum)
 
-	$SMFP = DllStructCreate("LONG;LONG;LONG;HANDLE", $MFP); clipboard METAFILEPICT struct
+	$MFP = DllStructCreate("LONG;LONG;LONG;HANDLE", $MFP); clipboard METAFILEPICT struct
 	if @error then return SetError(1,0,"Graph METAFILE struct err: " & $spectrum)
 
-	$HWMF = DllStructGetData($SMFP, 4);METAFILE handle ptr
+	$HWMF = DllStructGetData($MFP, 4);METAFILE handle ptr
 	if $HWMF = 0 then return SetError(1,0,"Graph METAFILE handle ptr err: " & $spectrum)
 
-	$WMFBUFFSIZE = DllCall('gdi32.dll', "uint", "GetMetaFileBitsEx", "handle", $HWMF, "int", 0, "ptr", null); buffer size in bytes
+	$MFP = 0;free MFP struct
+
+	$WMFBUFFSIZE = DllCall('gdi32.dll', "uint", "GetMetaFileBitsEx", "handle", $HWMF, "int", 0, "ptr", null); WMF buffer size in bytes
 	if $WMFBUFFSIZE = 0 then return SetError(1,0,"Graph WMF buffer size err: " & $spectrum)
 
-	$WMF = DllStructCreate('byte[' & $WMFBUFFSIZE[0] & ']')
+	$WMF = DllStructCreate('byte[' & $WMFBUFFSIZE[0] & ']'); WMF buffer struct
 	if @error then return SetError(1,0,"Graph WMF struct err: " & $spectrum)
-
-	$PWMF = DllStructGetPtr($WMF)
+	$PWMF = DllStructGetPtr($WMF); WMF buffer ptr
 	if @error then return SetError(1,0,"Graph WMF struct ptr err: " & $spectrum)
 
-	$WMFBYTES = DllCall('gdi32.dll', "uint", "GetMetaFileBitsEx", "handle", $HWMF, "int", $WMFBUFFSIZE[0], "ptr", $PWMF)
+	$WMFBYTES = DllCall('gdi32.dll', "uint", "GetMetaFileBitsEx", "handle", $HWMF, "int", $WMFBUFFSIZE[0], "ptr", $PWMF); fill WMF buffer ptr
 	if $WMFBYTES = 0 then SetError(1,0,"Graph WMF buffer err: " & $spectrum)
 
-	$HEMF = DllCall('gdi32.dll', "handle", "SetWinMetaFileBits", "int", $WMFBUFFSIZE[0], "ptr", $PWMF, "handle", null, "handle", null)
-	if $HEMF = Null then SetError(1,0,"Graph WMF buffer to HEMF handle err: " & $spectrum)
+	$HEHMF = DllCall('gdi32.dll', "handle", "SetWinMetaFileBits", "int", $WMFBUFFSIZE[0], "ptr", $PWMF, "handle", null, "handle", null); convert WMF buffer ptr to EMF handle
+	if $HEHMF = Null then SetError(1,0,"Graph WMF buffer to EHMF handle err: " & $spectrum)
 
-	$PEMF = _WinAPI_CreateBuffer($WMFBUFFSIZE[0])
-	if $PEMF = 0 then SetError(1,0,"Graph EMF buffer pointer err: " & $spectrum)
+	$WMF = 0; free WMF struct
 
-	$EMFBYTES = _WinAPI_GetEnhMetaFileBits($HEMF[0],$PEMF)
-	if $EMFBYTES = 0 then SetError(1,0,"Graph EMF buffer size err: " & $spectrum)
+	$EHMFBUFFSIZE = DllCall('gdi32.dll', 'uint', 'GetEnhMetaFileBits', 'handle', $HEHMF[0], 'uint', 0, 'ptr', 0)
+	if $EHMFBUFFSIZE = 0 then return SetError(1,0,"Graph EHMF buffer size err: " & $spectrum)
 
-	$EMF = _WinAPI_SetEnhMetaFileBits($PEMF,$EMFBYTES)
-	if $EMF then SetError(1,0,"Graph EMF err: " & $spectrum)
+	$EHMF = DllStructCreate('byte[' & $EHMFBUFFSIZE[0] & ']'); EMF buffer struct
+	if @error then return SetError(1,0,"Graph EHMF struct err: " & $spectrum)
+	$PEHMF = DllStructGetPtr($EHMF); EHMF buffer ptr
+	if @error then return SetError(1,0,"Graph EHMF struct ptr err: " & $spectrum)
 
-	$FEMF = _WinAPI_CopyEnhMetaFile($EMF, @ScriptDir & '\tmp.emf')
-;	$FEMF = _WinAPI_CopyEnhMetaFile($EMF,''); Copy EMF to memory
-	if $FEMF = 0 then SetError(1,0,"Graph EMF write err: " & $spectrum)
+	$EHMFBYTES = DllCall('gdi32.dll', 'uint', 'GetEnhMetaFileBits', 'handle', $HEHMF[0], 'uint', $EHMFBUFFSIZE[0], 'ptr', $PEHMF); fill EHMF buffer ptr
+	if $EHMFBYTES = 0 then SetError(1,0,"Graph EHMF buffer ptr err: " & $spectrum)
 
-	_WinAPI_FreeMemory($PEMF)
-	_WinAPI_DeleteEnhMetaFile($EMF)
+	$buffer = DllStructGetData($EHMF,1)
+	if @error then return SetError(1,0,"Graph EHMF buffer err: " & $spectrum)
+
+	$EHMF = 0;free EHMF struct
 
 	_GDIPlus_Startup()
-	$image = _GDIPlus_ImageLoadFromFile(@ScriptDir & '\tmp.emf')
-;	$image = _GDIPlus_BitmapCreateFromMemory(FileOpen($FEMF))
-	if $image = 0 then SetError(1,0,"Graph Image read err: " & $spectrum)
+	$image = _GDIPlus_BitmapCreateFromMemory($buffer)
+	if $image = 0 then SetError(1,0,"Graph Image memory read err: " & $spectrum)
 	$encoder = _GDIPlus_EncodersGetCLSID("PNG")
 	if @error then SetError(1,0,"Graph PNG encoder err: " & $spectrum)
 	_GDIPlus_ImageSaveToFileEx($image, $export & '\' & $spectrum & '_graph.png', $encoder)
@@ -152,4 +148,3 @@ Func _Artax_GetGraphEx($spectrum,$export)
 
 	_ClipBoard_Close()
 EndFunc
-
