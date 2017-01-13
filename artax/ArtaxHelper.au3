@@ -36,6 +36,7 @@ Func _Artax_GetPictureEx($spectrum,$export)
 	if not _ClipBoard_IsFormatAvailable(8) then return SetError(1,0,"Picture clip format err: " & $spectrum); CF_DIBV5
 
 	_ClipBoard_Open(0); hook clipboard
+	if @error then return SetError(1,0,"Picture clip lock err: " & $spectrum)
 
 	$HDIB = _ClipBoard_GetDataEx(8); DIB handle
 	if $HDIB = 0 then return SetError(1,0,"Picture DIB handle err: " & $spectrum)
@@ -45,7 +46,7 @@ Func _Artax_GetPictureEx($spectrum,$export)
 	if $DIBSIZE = 0 then return SetError(1,0,"Picture DIB size err: " & $spectrum)
 
 	$BITMAPINFOHEADER = DllStructCreate("DWORD;LONG;LONG;WORD;WORD;DWORD;DWORD;LONG;LONG;DWORD;DWORD",$HDIB);BITMAPINFOHEADER(40)
-	if @error then return SetError(1,0,"Picture BITMAPINFO struct err: " & $spectrum)
+	if @error then return SetError(1,0,"Picture BITMAPINFOHEDER struct err: " & $spectrum)
 
 	$HEADER = DllStructCreate("byte[2];byte[4];byte[4];byte[4]"); BITMAP HEADER(14)
 	if @error then return SetError(1,0,"Picture HEADER struct err: " & $spectrum)
@@ -75,7 +76,7 @@ Func _Artax_GetPictureEx($spectrum,$export)
 
 	_GDIPlus_Startup()
 	$bitmap = _GDIPlus_BitmapCreateFromMemory($buffer)
-	if @error then return SetError(1,0,"Picture Image read err: " & $spectrum)
+	if @error then return SetError(1,0,"Picture Image memory read err: " & $spectrum)
 	$encoder = _GDIPlus_EncodersGetCLSID("PNG")
 	if @error then return SetError(1,0,"Picture PNG encoder err: " & $spectrum)
 	_GDIPlus_ImageSaveToFileEx($bitmap, $export & '\' & $spectrum & '_picture.png', $encoder)
