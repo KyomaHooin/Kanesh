@@ -55,7 +55,7 @@ Func _Artax_GetPictureEx($spectrum,$export)
 	DllStructSetData($HEADER,3, 0)
 	DllStructSetData($HEADER,4, 54); BITMAP header(14) + BITMAPINFOHEADER(40)
 
-	$BITMAPINFOHEADER =0; free BITMAPINFOHEADER struct
+	$BITMAPINFOHEADER = 0; free BITMAPINFOHEADER struct
 
 	$DIB = DllStructCreate("byte[" & $DIBSIZE & "]", $PDIB); $ DB struct
 	if @error then return SetError(1,0,"Picture DIB struct err: " & $spectrum)
