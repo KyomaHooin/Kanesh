@@ -55,19 +55,22 @@ Func _Artax_GetPictureEx($spectrum,$export)
 	DllStructSetData($HEADER,3, 0)
 	DllStructSetData($HEADER,4, 54); BITMAP header(14) + BITMAPINFOHEADER(40)
 
+	$BITMAPINFOHEADER =0; free BITMAPINFOHEADER struct
+
 	$DIB = DllStructCreate("byte[" & $DIBSIZE & "]", $PDIB); $ DB struct
 	if @error then return SetError(1,0,"Picture DIB struct err: " & $spectrum)
 
 	$buffer = 	DllStructGetData($HEADER,1) & _
-				DllStructGetData($HEADER,2) & _
-				DllStructGetData($HEADER,3) & _
-				DllStructGetData($HEADER,4) & _
-				DllStructGetData($DIB,1)
+			DllStructGetData($HEADER,2) & _
+			DllStructGetData($HEADER,3) & _
+			DllStructGetData($HEADER,4) & _
+			DllStructGetData($DIB,1)
 	if @error then return SetError(1,0,"Picture MBF buffer err: " & $spectrum)
 
 	_MemGlobalUnlock($PDIB)
 	_MemGlobalFree($PDIB)
 
+	$HEADER = 0; free HEADER struct
 	$DIB = 0;free DIB struct
 
 	_GDIPlus_Startup()
