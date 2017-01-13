@@ -1,10 +1,6 @@
 ;
 ; Bruker Artax 400 spectrometer data export wrapper by Richard Bruna
 ;
-; TODO:
-;
-; -excel test
-;
 
 #AutoIt3Wrapper_Icon=artax.ico
 #NoTrayIcon
@@ -160,7 +156,6 @@ While 1
 						endif
 					wend
 				next
-				;----- cleanup ----
 				WinClose($atx_child)
 				WinClose($atx)
 			endif
