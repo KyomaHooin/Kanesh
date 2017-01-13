@@ -4,8 +4,6 @@
 ; TODO:
 ;
 ; -excel test
-; EMF/DIP buffer to Image
-; -remove tmp.* -> no overwrite(!)
 ;
 
 #AutoIt3Wrapper_Icon=artax.ico
@@ -163,7 +161,6 @@ While 1
 					wend
 				next
 				;----- cleanup ----
-				FileDelete(@ScriptDir & '\tmp.*')
 				WinClose($atx_child)
 				WinClose($atx)
 			endif
