@@ -159,9 +159,6 @@ While 1
 				WinClose($atx_child)
 				WinClose($atx)
 			endif
-			WinActivate($gui)
-			GUICtrlSetData($gui_error, "Done!")
-			GUICtrlSetState($button_exit,$GUI_FOCUS)
 		endif
 	endif
 	If $event = $GUI_EVENT_CLOSE or $event = $button_exit then
