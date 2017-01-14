@@ -52,7 +52,7 @@ Func _Artax_GetPictureEx($spectrum,$export)
 	if @error then return SetError(1,0,"Picture HEADER struct err: " & $spectrum)
 
 	DllStructSetData($HEADER,1, 0x4d42); "BM"
-	DllStructSetData($HEADER,2, 54 + DllStructGetData($BITMAPINFOHEADER,7)); BITMAP header(40) + BITMAPINFOHEADER(14) + SizeImage
+	DllStructSetData($HEADER,2, 54 + DllStructGetData($BITMAPINFOHEADER,7)); BITMAP header(14) + BITMAPINFOHEADER(40) + SizeImage
 	DllStructSetData($HEADER,3, 0)
 	DllStructSetData($HEADER,4, 54); BITMAP header(14) + BITMAPINFOHEADER(40)
 
@@ -66,7 +66,7 @@ Func _Artax_GetPictureEx($spectrum,$export)
 			DllStructGetData($HEADER,3) & _
 			DllStructGetData($HEADER,4) & _
 			DllStructGetData($DIB,1)
-	if @error then return SetError(1,0,"Picture MBF buffer err: " & $spectrum)
+	if @error then return SetError(1,0,"Picture BMP buffer err: " & $spectrum)
 
 	_MemGlobalUnlock($PDIB)
 	_MemGlobalFree($PDIB)
