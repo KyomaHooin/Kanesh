@@ -3,6 +3,14 @@
 #
 # CIE Lab D65 color offset to RGB graph. 
 #
+# TODO:
+#
+# -grab CSV data
+# -get color
+# -'"o" marker'
+# -export data
+# -loops
+#
 
 import matplotlib
 matplotlib.use('Agg')# Anti-Grain Geometry => no X, png only  
