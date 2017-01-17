@@ -81,20 +81,20 @@ While 1
 				$atx = WinWait('ARTAX','',5); ATX handle
 				if not $atx then
 					logger("ATX program err.")
-					return
-				endif
-				WinSetState($atx,'',@SW_HIDE)
-				$pass = WinWait('Password','',5); password handle
-				WinSetState($pass,'',@SW_HIDE)
-				WinActivate($pass)
-				WinWaitActive($pass,'',5)
-				Send('{ENTER}')
-				$err = WinWait('Error','',5); conn error handle
-				if $err then
-					WinSetState($err,'',@SW_HIDE)
-					WinActivate($err)
-					WinWaitActive($err,'',5)
-					WinClose($err)
+				else
+					WinSetState($atx,'',@SW_HIDE)
+					$pass = WinWait('Password','',5); password handle
+					WinSetState($pass,'',@SW_HIDE)
+					WinActivate($pass)
+					WinWaitActive($pass,'',5)
+					Send('{ENTER}')
+					$err = WinWait('Error','',5); conn error handle
+					if $err then
+						WinSetState($err,'',@SW_HIDE)
+						WinActivate($err)
+						WinWaitActive($err,'',5)
+						WinClose($err)
+					endif
 				endif
 				$atx_list = WinList("ARTAX")
 				for $i = 0 to UBound($atx_list) - 1;get ATX child
@@ -102,70 +102,68 @@ While 1
 				next
 				if not $atx_child then
 					logger("ATX program child err.")
-					WinClose($atx)
-					return
-				endif
-				for $i = 1 to UBound($project_list) - 1
-					; ---- open project ----
-					WinSetState($atx_child,'',@SW_MAXIMIZE)
-					WinActivate($atx_child)
-					WinWaitActive($atx_child,'',5)
-					Send('!fo')
-					WinWaitActive("Open Project",'',5)
-					Send($project_list[$i])
-					Send('!o')
-					; ---- project ----
-					Send('{TAB}{DOWN}')
-					$project_info = WinWait('Project Information','',5); get ATX child handle
-					WinSetState($project_info,'',@SW_HIDE)
-					WinActivate($project_info)
-					WinWaitActive($project_info,'',5)
-					WinClose($project_info)
-					Send('{DOWN}')
-					;---- spectra ----
-					while 1
+				else
+					for $i = 1 to UBound($project_list) - 1
+						; ---- open project ----
+						WinSetState($atx_child,'',@SW_MAXIMIZE)
+						WinActivate($atx_child)
+						WinWaitActive($atx_child,'',5)
+						Send('!fo')
+						WinWaitActive("Open Project",'',5)
+						Send($project_list[$i])
+						Send('!o')
+						; ---- project ----
+						Send('{TAB}{DOWN}')
+						$project_info = WinWait('Project Information','',5); get ATX child handle
+						WinSetState($project_info,'',@SW_HIDE)
+						WinActivate($project_info)
+						WinWaitActive($project_info,'',5)
+						WinClose($project_info)
 						Send('{DOWN}')
-						Switch @OSVersion
-							Case 'WIN_XP'
-								sleep(5000); Hold on a second!
-								$spectra_next = StringRegExpReplace(WinGetTitle($atx_child),"^.*\[(.*)\]$","$1"); Win XP
-							case 'WIN_7','WIN_8','WIN_81','WIN_10'
-								$spectra_next = 'test'
-							case Else
-								logger("Unsupported OS version.")
+						;---- spectra ----
+						while 1
+							Send('{DOWN}')
+							Switch @OSVersion
+								Case 'WIN_XP'
+									sleep(5000); Hold on a second!
+									$spectra_next = StringRegExpReplace(WinGetTitle($atx_child),"^.*\[(.*)\]$","$1"); Win XP
+								case 'WIN_7','WIN_8','WIN_81','WIN_10'
+									$spectra_next = 'test'
+								case Else
+									logger("Unsupported OS version.")
+									ExitLoop
+							EndSwitch
+							if $spectra_next <> $spectra_prev then
+								DirCreate(@ScriptDir & '\export\' & $spectra_next)
+								;---- table ----
+								Send('^d')
+								sleep(1000);Hold on a second!
+								$table = _Artax_GetTableEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
+								if @error then logger($table)
+								;------- graph -----
+								Send('^c')
+								sleep(1000);Hold on a second!
+								$graph = _Artax_GetGraphEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
+								if @error then logger($graph)
+								;---- picture ----
+								Send('{RIGHT}{DOWN}')
+								$atx_picture = WinWait("Picture",'',5)
+								WinActivate($atx_picture)
+								WinWaitActive($atx_picture,'',5)
+								MouseClick('right')
+								Send('c')
+								sleep(1000);Hold on a second!
+								$picture = _Artax_GetPictureEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
+								if @error then logger($picture)
+								WinClose($atx_picture)
+								; ---- update ----
+								$spectra_prev = $spectra_next
+							else
 								ExitLoop
-						EndSwitch
-						if $spectra_next <> $spectra_prev then
-							DirCreate(@ScriptDir & '\export\' & $spectra_next)
-							;---- table ----
-							Send('^d')
-							sleep(1000);Hold on a second!
-							$table = _Artax_GetTableEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
-							if @error then logger($table)
-							;------- graph -----
-							Send('^c')
-							sleep(1000);Hold on a second!
-							$graph = _Artax_GetGraphEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
-							if @error then logger($graph)
-							;---- picture ----
-							Send('{RIGHT}{DOWN}')
-							$atx_picture = WinWait("Picture",'',5)
-							WinActivate($atx_picture)
-							WinWaitActive($atx_picture,'',5)
-							MouseClick('right')
-							Send('c')
-							sleep(1000);Hold on a second!
-							$picture = _Artax_GetPictureEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
-							if @error then logger($picture)
-							WinClose($atx_picture)
-							; ---- update ----
-							$spectra_prev = $spectra_next
-						else
-							logger("No project spectra left: " & $project_list[$i])
-							ExitLoop
-						endif
-					wend
-				next
+							endif
+						wend
+					next
+				endif
 				WinClose($atx_child)
 				WinClose($atx)
 			endif
