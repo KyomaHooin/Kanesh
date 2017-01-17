@@ -86,7 +86,7 @@ While 1
 				WinWaitActive($pass,'',5)
 				Send('{ENTER}')
 				$err = WinWait('Error','',5); conn error handle
-				if not $err then
+				if $err then
 					WinSetState($err,'',@SW_HIDE)
 					WinActivate($err)
 					WinWaitActive($err,'',5)
