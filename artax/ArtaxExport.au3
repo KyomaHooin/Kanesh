@@ -79,6 +79,10 @@ While 1
 				; ---- ATX ----
 				run(GUICtrlRead($gui_exec)); run artax executable
 				$atx = WinWait('ARTAX','',5); ATX handle
+				if not $atx then
+					logger("ATX program err.")
+					return
+				endif
 				WinSetState($atx,'',@SW_HIDE)
 				$pass = WinWait('Password','',5); password handle
 				WinSetState($pass,'',@SW_HIDE)
@@ -96,6 +100,11 @@ While 1
 				for $i = 0 to UBound($atx_list) - 1;get ATX child
 					if $atx_list[$i][0] == 'ARTAX' and $atx_list[$i][1] <> $atx then $atx_child = $atx_list[$i][1]
 				next
+				if not $atx_child then
+					logger("ATX program child err.")
+					WinClose($atx)
+					return
+				endif
 				for $i = 1 to UBound($project_list) - 1
 					; ---- open project ----
 					WinSetState($atx_child,'',@SW_MAXIMIZE)
