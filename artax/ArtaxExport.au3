@@ -46,7 +46,7 @@ GUICtrlSetState($button_export,$GUI_FOCUS)
 GUISetState(@SW_SHOW)
 
 While 1
-	global $atx,$pass,$err,$atx_child
+	local $atx,$pass,$err,$atx_child,$project_info,$spectra_prev,$spectra_next,$atx_picture
 	$event = GUIGetMsg(); catch event
 	if $event = $button_path Then; data path
 		$project_path = FileSelectFolder("ArtaxExport / Project directory", @HomeDrive)
@@ -86,10 +86,12 @@ While 1
 				WinWaitActive($pass,'',5)
 				Send('{ENTER}')
 				$err = WinWait('Error','',5); conn error handle
-				WinSetState($err,'',@SW_HIDE)
-				WinActivate($err)
-				WinWaitActive($err,'',5)
-				WinClose($err)
+				if not $err then
+					WinSetState($err,'',@SW_HIDE)
+					WinActivate($err)
+					WinWaitActive($err,'',5)
+					WinClose($err)
+				endif
 				$atx_list = WinList("ARTAX")
 				for $i = 0 to UBound($atx_list) - 1;get ATX child
 					if $atx_list[$i][0] == 'ARTAX' and $atx_list[$i][1] <> $atx then $atx_child = $atx_list[$i][1]
@@ -112,7 +114,6 @@ While 1
 					WinClose($project_info)
 					Send('{DOWN}')
 					;---- spectra ----
-					$spectra_prev = ''
 					while 1
 						Send('{DOWN}')
 						Switch @OSVersion
