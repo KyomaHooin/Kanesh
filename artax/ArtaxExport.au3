@@ -128,32 +128,32 @@ While 1
 								sleep(5000); Hold on a second!
 								$spectra_next = StringRegExpReplace(WinGetTitle($atx_child),"^.*\[(.*)\]$","$1"); Win XP
 								if $spectra_next <> $spectra_prev then
-								DirCreate(@ScriptDir & '\export\' & $spectra_next)
-								;---- table ----
-								Send('^d')
-								sleep(1000);Hold on a second!
-								$table = _Artax_GetTableEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
-								if @error then logger($table)
-								;------- graph -----
-								Send('^c')
-								sleep(1000);Hold on a second!
-								$graph = _Artax_GetGraphEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
-								if @error then logger($graph)
-								;---- picture ----
-								Send('{RIGHT}{DOWN}')
-								$atx_picture = WinWait("Picture",'',10)
-								WinActivate($atx_picture)
-								WinWaitActive($atx_picture,'',5)
-								$atx_picture_pos = WinGetPos($atx_picture)
-								if not @error then MouseMove($atx_picture_pos[0] + 50,$atx_picture_pos[1] + 50,0)
-								MouseClick('right')
-								Send('c')
-								sleep(1000);Hold on a second!
-								$picture = _Artax_GetPictureEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
-								if @error then logger($picture)
-								WinClose($atx_picture)
-								; ---- update ----
-								$spectra_prev = $spectra_next
+									DirCreate(@ScriptDir & '\export\' & $spectra_next)
+									;---- table ----
+									Send('^d')
+									sleep(1000);Hold on a second!
+									$table = _Artax_GetTableEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
+									if @error then logger($table)
+									;------- graph -----
+									Send('^c')
+									sleep(1000);Hold on a second!
+									$graph = _Artax_GetGraphEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
+									if @error then logger($graph)
+									;---- picture ----
+									Send('{RIGHT}{DOWN}')
+									$atx_picture = WinWait("Picture",'',10)
+									WinActivate($atx_picture)
+									WinWaitActive($atx_picture,'',5)
+									$atx_picture_pos = WinGetPos($atx_picture)
+									if not @error then MouseMove($atx_picture_pos[0] + 50,$atx_picture_pos[1] + 50,0)
+									MouseClick('right')
+									Send('c')
+									sleep(1000);Hold on a second!
+									$picture = _Artax_GetPictureEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
+									if @error then logger($picture)
+									WinClose($atx_picture)
+									; ---- update ----
+									$spectra_prev = $spectra_next
 								else
 									ExitLoop
 								endif
