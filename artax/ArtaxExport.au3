@@ -90,7 +90,7 @@ While 1
 				WinActivate($pass)
 				WinWaitActive($pass,'',5)
 				Send('{ENTER}')
-				$err = WinWait('Error','',15); conn error handle
+				$err = WinWait('Error','',10); conn error handle
 				if not $err then
 					logger("DSP err.")
 				else
