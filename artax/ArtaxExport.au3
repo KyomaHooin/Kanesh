@@ -46,23 +46,24 @@ GUICtrlSetState($button_export,$GUI_FOCUS)
 GUISetState(@SW_SHOW)
 
 While 1
-	local $atx,$pass,$err,$atx_child,$project_info,$spectra_prev,$spectra_next,$atx_picture
+	local $atx,$pass,$err,$atx_child,$project_info,$spectra_prev,$spectra_next,$atx_picture,$atx_picture_pos
 	$event = GUIGetMsg(); catch event
 	if $event = $button_path Then; data path
 		$project_path = FileSelectFolder("ArtaxExport / Project directory", @HomeDrive)
 		if $project_path then
-				GUICtrlSetData($gui_path, $project_path)
-				$path_history = $project_path; update last..
+			GUICtrlSetData($gui_path, $project_path)
+			$path_history = $project_path; update last..
 		endif
 	EndIf
 	if $event = $button_exec Then; data path
 		$exec_path = FileOpenDialog("ArtaxExport/ Program file", @HomeDrive, "Artax program (*.exe)")
 		if not @error then
-				GUICtrlSetData($gui_exec, $exec_path)
-				$exec_history = $exec_path; update last..
+			GUICtrlSetData($gui_exec, $exec_path)
+			$exec_history = $exec_path; update last..
 		endif
 	EndIf
 	if $event = $button_export Then; export
+		$project_list = _FileListToArray(GUICtrlRead($gui_path), "*.rtx", 1, True)
 		if GUICtrlRead($gui_path) == '' or GUICtrlRead($gui_exec) == '' then
 			GUICtrlSetData($gui_error, "Chyba: Prazdna cesta.")
 		elseif not FileExists(GUICtrlRead($gui_exec)) Then
@@ -70,70 +71,63 @@ While 1
 		elseif UBound(ProcessList('ARTAX.exe')) >= 2 then
 			GUICtrlSetData($gui_error, "Chyba: Ukoncete bezici program.")
 		elseif not FileExists(GUICtrlRead($gui_path)) then
-				GUICtrlSetData($gui_error, "Chyba: Adresar neexistuje.")
+			GUICtrlSetData($gui_error, "Chyba: Adresar neexistuje.")
+		elseif UBound($project_list) < 2 then
+			GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
+		elseif @OSVersion <> 'WIN_XP' then
+			GUICtrlSetData($gui_error, "Chyba: Nepodporovany operacni system.")
 		else
-			$project_list = _FileListToArray(GUICtrlRead($gui_path),"*.rtx",1, True)
-			if UBound($project_list) < 2 then
-				GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
+			; ---- ATX ----
+			run(GUICtrlRead($gui_exec)); run artax executable
+			$atx = WinWait('ARTAX','',10); ATX handle
+			if not $atx then
+				logger("ATX program err.")
 			else
-				; ---- ATX ----
-				run(GUICtrlRead($gui_exec)); run artax executable
-				$atx = WinWait('ARTAX','',5); ATX handle
-				if not $atx then
-					logger("ATX program err.")
+				BlockInput(1); block user input
+				WinSetState($atx,'',@SW_HIDE)
+				$pass = WinWait('Password','',10); password handle
+				WinSetState($pass,'',@SW_HIDE)
+				WinActivate($pass)
+				WinWaitActive($pass,'',5)
+				Send('{ENTER}')
+				$err = WinWait('Error','',15); conn error handle
+				if not $err then
+					logger("DSP err.")
 				else
-					WinSetState($atx,'',@SW_HIDE)
-					$pass = WinWait('Password','',5); password handle
-					WinSetState($pass,'',@SW_HIDE)
-					WinActivate($pass)
-					WinWaitActive($pass,'',5)
-					Send('{ENTER}')
-					$err = WinWait('Error','',5); conn error handle
-					if $err then
-						WinSetState($err,'',@SW_HIDE)
-						WinActivate($err)
-						WinWaitActive($err,'',5)
-						WinClose($err)
-					endif
-				endif
-				$atx_list = WinList("ARTAX")
-				for $i = 0 to UBound($atx_list) - 1;get ATX child
-					if $atx_list[$i][0] == 'ARTAX' and $atx_list[$i][1] <> $atx then $atx_child = $atx_list[$i][1]
-				next
-				if not $atx_child then
-					logger("ATX program child err.")
-				else
-					for $i = 1 to UBound($project_list) - 1
-						; ---- open project ----
-						WinSetState($atx_child,'',@SW_MAXIMIZE)
-						WinActivate($atx_child)
-						WinWaitActive($atx_child,'',5)
-						Send('!fo')
-						WinWaitActive("Open Project",'',5)
-						Send($project_list[$i])
-						Send('!o')
-						; ---- project ----
-						Send('{TAB}{DOWN}')
-						$project_info = WinWait('Project Information','',5); get ATX child handle
-						WinSetState($project_info,'',@SW_HIDE)
-						WinActivate($project_info)
-						WinWaitActive($project_info,'',5)
-						WinClose($project_info)
-						Send('{DOWN}')
-						;---- spectra ----
-						while 1
+					WinSetState($err,'',@SW_HIDE)
+					WinActivate($err)
+					WinWaitActive($err,'',5)
+					WinClose($err)
+					$atx_list = WinList("ARTAX")
+					for $i = 0 to UBound($atx_list) - 1;get ATX child
+						if $atx_list[$i][0] == 'ARTAX' and $atx_list[$i][1] <> $atx then $atx_child = $atx_list[$i][1]
+					next
+					if not $atx_child then
+						logger("ATX program child err.")
+					else
+						for $i = 1 to UBound($project_list) - 1
+							; ---- open project ----
+							WinSetState($atx_child,'',@SW_MAXIMIZE)
+							WinActivate($atx_child)
+							WinWaitActive($atx_child,'',10)
+							Send('!fo')
+							WinWaitActive("Open Project",'',5)
+							Send($project_list[$i])
+							Send('!o')
+							; ---- project ----
+							Send('{TAB}{DOWN}')
+							$project_info = WinWait('Project Information','',5); get ATX child handle
+							WinSetState($project_info,'',@SW_HIDE)
+							WinActivate($project_info)
+							WinWaitActive($project_info,'',5)
+							WinClose($project_info)
 							Send('{DOWN}')
-							Switch @OSVersion
-								Case 'WIN_XP'
-									sleep(5000); Hold on a second!
-									$spectra_next = StringRegExpReplace(WinGetTitle($atx_child),"^.*\[(.*)\]$","$1"); Win XP
-								case 'WIN_7','WIN_8','WIN_81','WIN_10'
-									$spectra_next = 'test'
-								case Else
-									logger("Unsupported OS version.")
-									ExitLoop
-							EndSwitch
-							if $spectra_next <> $spectra_prev then
+							;---- spectra ----
+							while 1
+								Send('{DOWN}')
+								sleep(5000); Hold on a second!
+								$spectra_next = StringRegExpReplace(WinGetTitle($atx_child),"^.*\[(.*)\]$","$1"); Win XP
+								if $spectra_next <> $spectra_prev then
 								DirCreate(@ScriptDir & '\export\' & $spectra_next)
 								;---- table ----
 								Send('^d')
@@ -147,9 +141,11 @@ While 1
 								if @error then logger($graph)
 								;---- picture ----
 								Send('{RIGHT}{DOWN}')
-								$atx_picture = WinWait("Picture",'',5)
+								$atx_picture = WinWait("Picture",'',10)
 								WinActivate($atx_picture)
 								WinWaitActive($atx_picture,'',5)
+								$atx_picture_pos = WinGetPos($atx_picture)
+								if not @error then MouseMove($atx_picture_pos[0] + 50,$atx_picture_pos[1] + 50,0)
 								MouseClick('right')
 								Send('c')
 								sleep(1000);Hold on a second!
@@ -158,14 +154,17 @@ While 1
 								WinClose($atx_picture)
 								; ---- update ----
 								$spectra_prev = $spectra_next
-							else
-								ExitLoop
-							endif
-						wend
-					next
+								else
+									ExitLoop
+								endif
+							wend
+						next
+					EndIf
 				endif
 				WinClose($atx_child)
 				WinClose($atx)
+				GUICtrlSetData($gui_error, "Hotovo.")
+				BlockInput(0); unblock user input
 			endif
 		endif
 	endif
