@@ -15,9 +15,12 @@
 ;
 
 Func _Artax_GetTableEx($spectrum,$export)
-	if not _ClipBoard_IsFormatAvailable(1) then MsgBox(Default,'err',"Table clip format err." & $spectrum); CF_DIBV5
+	if not _ClipBoard_IsFormatAvailable(1) then SetError(1,0,"Table clip format err: " & $spectrum); CF_TEXT
 
-	$TEXT = ClipGet()
+	_ClipBoard_Open(0); hook clipboard
+	if @error then return SetError(1,0,"Table clip lock err: " & $spectrum)
+
+	$TEXT = _ClipBoard_GetData(1)
 	if @error then return SetError(1,0,"Table get err: " & $spectrum)
 	$tab = FileOpen($export & '\' & $spectrum & '.csv', 258); UTF-8 no BOM overwrite
 	if @error then return SetError(1,0,"Table file open err: " & $spectrum)
