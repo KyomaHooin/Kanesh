@@ -7,10 +7,11 @@ Bruker "Artax 400" XRF spectrometer data export wrapper.
 FILE
 
 <pre>
- ArtaxExport.au3 - Main program.
- ArtaxHelper.au3 - Helper clipboard functions.
-       artax.ico - Program icon. 
-artax_screen.png - Screenshot.
+   ArtaxExport.au3 - Main program.
+   ArtaxHelper.au3 - Helper clipboard functions.
+_XMLDomWrapper.au3 - XML library by Stephen Podhajecki.
+         artax.ico - Program icon. 
+  artax_screen.png - Screenshot.
 </pre>
 
 CONTACT
