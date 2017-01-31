@@ -1,6 +1,7 @@
 ;
 ; Helper clipboard data extraction function for Bruker Artax 400 binary program.
 ;
+; _Artax_GetClean ........... Clean the clipboard.
 ; _Artax_GetTableEx ......... Clipboard CF_TEXT to CSV file.
 ; _Artax_GetPictureEx ....... Convert clipboard CF_DIB to BITMAP, encoded to PNG file.
 ; _Artax_GetGraphEx ......... Convert clipboard CF_METAFILEPICT WMF to EMF, encoded to PNG file.
@@ -9,6 +10,18 @@
 
 #include <Clipboard.au3>
 #include <GDIPlus.au3>
+
+;
+; Clipboard cleanup.
+;
+
+Func _Artax_GetClean()
+	_ClipBoard_Open(0)
+	if @error then return SetError(1,0,"Clip hook err.")
+	_ClipBoard_Empty()
+	if @error then return SetError(1,0,"Clip empty err.")
+	_ClipBoard_Close()
+EndFunc
 
 ;
 ; Get CSV from TEXT clipboard.
