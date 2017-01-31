@@ -6,6 +6,7 @@
 #NoTrayIcon
 
 #include <GUIConstantsEx.au3>
+#include <_XMLDomWrapper.au3>
 #include <GUIComboBox.au3>
 #include <ArtaxHelper.au3>
 #include <File.au3>
@@ -46,7 +47,7 @@ GUICtrlSetState($button_export,$GUI_FOCUS)
 GUISetState(@SW_SHOW)
 
 While 1
-	local $atx,$pass,$err,$atx_child,$project_info,$spectra_prev,$spectra_next,$atx_picture,$atx_picture_pos
+	local $atx,$pass,$err,$atx_child,$project_info,$spectra,$atx_picture,$atx_picture_pos
 	$event = GUIGetMsg(); catch event
 	if $event = $button_path Then; data path
 		$project_path = FileSelectFolder("ArtaxExport / Project directory", @HomeDrive)
@@ -77,6 +78,8 @@ While 1
 		elseif @OSVersion <> 'WIN_XP' then
 			GUICtrlSetData($gui_error, "Chyba: Nepodporovany operacni system.")
 		else
+			; ---- cleanup ----
+			_Artax_GetClean()
 			; ---- ATX ----
 			run(GUICtrlRead($gui_exec)); run artax executable
 			$atx = WinWait('ARTAX','',10); ATX handle
@@ -90,7 +93,7 @@ While 1
 				WinActivate($pass)
 				WinWaitActive($pass,'',5)
 				Send('{ENTER}')
-				$err = WinWait('Error','',10); conn error handle
+				$err = WinWait('Error','',15); conn error handle
 				if not $err then
 					logger("DSP err.")
 				else
@@ -106,15 +109,36 @@ While 1
 						logger("ATX program child err.")
 					else
 						for $i = 1 to UBound($project_list) - 1
+							; ---- get spectra names ----
+							_XMLLoadXML(FileRead($project_list[$i]))
+							if @error then
+								logger("XML instance error.")
+								ContinueLoop
+							endif
+							$spectra_count = _XMLGetNodeCount('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance')
+							if @error then
+								logger("XML node count error.")
+								ContinueLoop
+							endif
+							local $spectra_name[$spectra_count]
+							for $j = 1 to $spectra_count
+								$spectra_name[$j-1] = _XMLGetAttrib('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance[' & $j & ']', 'Name')
+								if @error then
+									logger("XML spectra error.")
+									ContinueLoop
+								EndIf
+							next
 							; ---- open project ----
 							WinSetState($atx_child,'',@SW_MAXIMIZE)
 							WinActivate($atx_child)
-							WinWaitActive($atx_child,'',10)
+							WinWaitActive($atx_child,'',15)
 							Send('!fo')
 							WinWaitActive("Open Project",'',5)
 							Send($project_list[$i])
 							Send('!o')
 							; ---- project ----
+							$project = StringRegExpReplace($project_list[$i],".*\\(.*).rtx$","$1")
+							DirCreate(@ScriptDir & '\export\' & $project)
 							Send('{TAB}{DOWN}')
 							$project_info = WinWait('Project Information','',5); get ATX child handle
 							WinSetState($project_info,'',@SW_HIDE)
@@ -123,41 +147,37 @@ While 1
 							WinClose($project_info)
 							Send('{DOWN}')
 							;---- spectra ----
-							while 1
+							for $k = 0 to UBound($spectra_name) - 1
 								Send('{DOWN}')
-								sleep(5000); Hold on a second!
-								$spectra_next = StringRegExpReplace(WinGetTitle($atx_child),"^.*\[(.*)\]$","$1"); Win XP
-								if $spectra_next <> $spectra_prev then
-									DirCreate(@ScriptDir & '\export\' & $spectra_next)
-									;---- table ----
-									Send('^d')
-									sleep(1000);Hold on a second!
-									$table = _Artax_GetTableEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
-									if @error then logger($table)
-									;------- graph -----
-									Send('^c')
-									sleep(1000);Hold on a second!
-									$graph = _Artax_GetGraphEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
-									if @error then logger($graph)
-									;---- picture ----
-									Send('{RIGHT}{DOWN}')
-									$atx_picture = WinWait("Picture",'',10)
-									WinActivate($atx_picture)
-									WinWaitActive($atx_picture,'',5)
-									$atx_picture_pos = WinGetPos($atx_picture)
-									if not @error then MouseMove($atx_picture_pos[0] + 50,$atx_picture_pos[1] + 50,0)
-									MouseClick('right')
-									Send('c')
-									sleep(1000);Hold on a second!
-									$picture = _Artax_GetPictureEx($spectra_next, @ScriptDir & '\export\' & $spectra_next)
-									if @error then logger($picture)
-									WinClose($atx_picture)
-									; ---- update ----
-									$spectra_prev = $spectra_next
-								else
-									ExitLoop
+								;---- table ----
+								Send('^d')
+								sleep(1000)
+								Send('^d')
+								sleep(1000); Internal bug..
+								$table = _Artax_GetTableEx($spectra_name[$k], @ScriptDir & '\export\' & $project)
+								if @error then
+									logger($table)
+									ContinueLoop
 								endif
-							wend
+								;------- graph -----
+								Send('^c')
+								sleep(1000);Hold on a second!
+								$graph = _Artax_GetGraphEx($spectra_name[$k], @ScriptDir & '\export\' & $project)
+								if @error then logger($graph)
+								;---- picture ----
+								Send('{RIGHT}{DOWN}')
+								$atx_picture = WinWait("Picture",'',10)
+								WinActivate($atx_picture)
+								WinWaitActive($atx_picture,'',5)
+								$atx_picture_pos = WinGetPos($atx_picture)
+								if not @error then MouseMove($atx_picture_pos[0] + 50,$atx_picture_pos[1] + 50,0)
+								MouseClick('right')
+								Send('c')
+								sleep(1000);Hold on a second!
+								$picture = _Artax_GetPictureEx($spectra_name[$k], @ScriptDir & '\export\' & $project)
+								if @error then logger($picture)
+								WinClose($atx_picture)
+							next
 						next
 					EndIf
 				endif
