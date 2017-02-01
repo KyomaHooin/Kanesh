@@ -178,9 +178,9 @@ While 1
 WEnd
 
 func _Artax_GetSpectra($file)
-	_XMLLoadXML(FileRead($project_list[$i]))
+	_XMLLoadXML(FileRead($file))
 	if @error then return SetError(1,0,"XML instance error.")
-	local $count = _XMLGetNodeCount('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance')
+	$count = _XMLGetNodeCount('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance')
 	if @error then return SetError(1,0,"XML node count error.")
 	local $name[$count]
 	for $i = 1 to $count
