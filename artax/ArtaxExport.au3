@@ -15,7 +15,6 @@ $runtime = @YEAR & @MON & @MDAY & 'T' & @HOUR & @MIN & @SEC
 $log = @scriptdir & '\ArtaxExport.log'
 
 ;LOGGING
-
 $logfile = FileOpen($log, 1); append..
 if @error then exit; silent exit..
 $path_history = StringRegExpReplace(FileReadLine($log, -1), "(.*)\|.*", "$1")
@@ -29,8 +28,7 @@ DirCreate(@scriptdir & '\export')
 if UBound(ProcessList(@ScriptName)) > 2 then exit; already running
 
 ;GUI
-
-$gui = GUICreate("ArtaxExport v 1.4", 351, 91)
+$gui = GUICreate("ArtaxExport v 1.5", 351, 91)
 $label_path = GUICtrlCreateLabel("Projekt:", 6, 10, 35, 21)
 $gui_path = GUICtrlCreateInput($path_history, 46, 8, 217, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
@@ -42,12 +40,10 @@ $button_export = GUICtrlCreateButton("Export", 188, 63, 75, 21)
 $button_exit = GUICtrlCreateButton("Konec", 270, 63, 75, 21)
 
 ;GUI INIT
-
 GUICtrlSetState($button_export,$GUI_FOCUS)
 GUISetState(@SW_SHOW)
 
 While 1
-	local $atx,$pass,$err,$atx_child,$project_info,$spectra,$atx_picture,$atx_picture_pos
 	$event = GUIGetMsg(); catch event
 	if $event = $button_path Then; data path
 		$project_path = FileSelectFolder("ArtaxExport / Project directory", @HomeDrive)
@@ -75,8 +71,6 @@ While 1
 			GUICtrlSetData($gui_error, "Chyba: Adresar neexistuje.")
 		elseif UBound($project_list) < 2 then
 			GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
-		elseif @OSVersion <> 'WIN_XP' then
-			GUICtrlSetData($gui_error, "Chyba: Nepodporovany operacni system.")
 		else
 			; ---- cleanup ----
 			_Artax_GetClean()
@@ -110,24 +104,11 @@ While 1
 					else
 						for $i = 1 to UBound($project_list) - 1
 							; ---- get spectra names ----
-							_XMLLoadXML(FileRead($project_list[$i]))
+							$spectra_name = _Artax_GetSpectra($project_list[$i])
 							if @error then
-								logger("XML instance error.")
+								logger("Spectra name err.")
 								ContinueLoop
 							endif
-							$spectra_count = _XMLGetNodeCount('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance')
-							if @error then
-								logger("XML node count error.")
-								ContinueLoop
-							endif
-							local $spectra_name[$spectra_count]
-							for $j = 1 to $spectra_count
-								$spectra_name[$j-1] = _XMLGetAttrib('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance[' & $j & ']', 'Name')
-								if @error then
-									logger("XML spectra error.")
-									ContinueLoop
-								EndIf
-							next
 							; ---- open project ----
 							WinSetState($atx_child,'',@SW_MAXIMIZE)
 							WinActivate($atx_child)
@@ -151,9 +132,9 @@ While 1
 								Send('{DOWN}')
 								;---- table ----
 								Send('^d')
-								sleep(1000)
+								sleep(500)
 								Send('^d')
-								sleep(1000); Internal bug..
+								sleep(500); internal bug..
 								$table = _Artax_GetTableEx($spectra_name[$k], @ScriptDir & '\export\' & $project)
 								if @error then
 									logger($table)
@@ -196,7 +177,18 @@ While 1
 	endif
 WEnd
 
+func _Artax_GetSpectra($file)
+	_XMLLoadXML(FileRead($project_list[$i]))
+	if @error then return SetError(1,0,"XML instance error.")
+	local $count = _XMLGetNodeCount('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance')
+	if @error then return SetError(1,0,"XML node count error.")
+	local $name[$count]
+	for $i = 1 to $count
+		$name[$i-1] = _XMLGetAttrib('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance[' & $i & ']', 'Name')
+	next
+	return $name
+endfunc
+
 func logger($text)
 	FileWriteLine($logfile, $text)
 endfunc
-
