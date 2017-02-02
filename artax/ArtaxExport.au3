@@ -72,6 +72,7 @@ While 1
 			GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
 		else
 			; ---- patch ----
+			_Artax_Patch($inifile)
 			; ---- cleanup ----
 			_Artax_GetClean()
 			; ---- ATX ----
