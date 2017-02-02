@@ -14,44 +14,54 @@
 #include <Clipboard.au3>
 #include <GDIPlus.au3>
 
-func _Artax_Patch($file)
+func _Artax_Patch($inifile)
 
-;ARTAX.ini:
+;ARTAX.ini [Chart]
+local $chart[6][2]=[ _
+	['FixedXL',0], _
+	['FixedXH',0], _
+	['FixedY',1], _
+	['LowX',1], _
+	['HighX',15], _
+	['HighY',800]]
 
-;[Chart]
-;
-;FixedXL=0
-;FixedXH=0
-;FixedY=1
-;LowX=1
-;HighX=15
-;HighY=800
+for $i = 0 to ubound($chart) - 1
+	check line -> replace -> else
+	check chart -> insert else
+	create chart -> insert
+next
 
-if RegRead('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm') then
 ;[HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm]
+local $mainform[12][2]=[ _; CZ_DWORD??/ WIN7 ?
+	['ChannelAction_Checked','FALSE'], _
+	['CpsModeAction_Checked','FALSE'], _
+	['LogarithmicAction_Checked','FALSE'], _
+	['ShowBackgrAction_Checked','FALSE'], _
+	['ShowCorrDataAction_Checked','FALSE'], _
+	['ShowDiffAction_Checked','FALSE'], _
+	['OnlyOneAction_Checked','TRUE'], _
+	['FilledAction_Checked','TRUE'], _
+	['SpcChart_ChartColor','clWhite'], _
+	['SpcChart_CursorType','ctNone'], _
+	['SpcChart_WindColor','clWhite'], _
+	['SpcChart_ElementLinesVisible','FALSE']]
 
-;ChannelAction_Checked = FALSE
-;CpsModeAction_Checked = FALSE
-;LogarithmicAction_Checked = FALSE
-;ShowBackgrAction_Checked = FALSE
-;ShowCorrDataAction_Checked = FALSE
-;ShowDiffAction_Checked = FALSE
-;OnlyOneAction_Checked = TRUE
-;FilledAction_Checked = TRUE
-
-;"SpcChart_ChartColor"="clWhite"
-;"SpcChart_CursorType"="ctNone"
-;"SpcChart_WindColor"="clWhite"
-
-;"SpcChart_ElementLinesVisible"="FALSE"
+for $i = 0 to ubound($mainform) - 1
+	RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm', $mainform[$i], 'REG_SZ', $mainform[$i][0]) 
+next
 
 ;[HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\PTForm]
+local $ptform[4][2]=[ _; CZ_DWORD? / WIN7 ?
+	['KCheckBox_Checked','TRUE'], _
+	['LCheckBox_Checked','TRUE'], _
+	['MCheckBox_Checked','TRUE'], _
+	['TextCheckBox_Checked','TRUE'], _
+	['LineCheckBox_Checked','FALSE']]
 
-;"KCheckBox_Checked"="TRUE"
-;"LCheckBox_Checked"="TRUE"
-;"MCheckBox_Checked"="TRUE"
-;"TextCheckBox_Checked"="TRUE"
-;"LineCheckBox_Checked"="FALSE"
+for $i = 0 to ubound($mainform) - 1
+	RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\PTForm', $ptform[$i], 'REG_SZ', $ptform[$i][0]) 
+next
+
 EndFunc
 
 ; Spectra name array from project XML file.
