@@ -13,9 +13,9 @@
 #include <_XMLDomWrapper.au3>
 #include <Clipboard.au3>
 #include <GDIPlus.au3>
+#include <File.au3>
 
 func _Artax_Patch($inifile)
-
 ;ARTAX.ini [Chart]
 local $chart[6][2]=[ _
 	['FixedXL',0], _
@@ -25,14 +25,25 @@ local $chart[6][2]=[ _
 	['HighX',15], _
 	['HighY',800]]
 
+$ini = FileOpen($inifile,256); rw no BOM
+
+$buff = FileRead($ini)
+
+MsgBox(Default,"in",$buff)
+
 for $i = 0 to ubound($chart) - 1
-	check line -> replace -> else
-	check chart -> insert else
-	create chart -> insert
+	StringRegExpReplace($buff,'(.*)(' & $chart[$i][0] & '=\d+)(.*)', '$1' & $chart[$i][0] & '=' & $chart[$i][1] & '$3')
+
+;	check line -> replace -> else
+;	check chart -> insert else
+;	create chart -> insert
 next
 
-;[HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm]
-local $mainform[12][2]=[ _; CZ_DWORD??/ WIN7 ?
+MsgBox(Default,"out",$buff)
+
+;FileWrite($ini,$buff)
+
+local $mainform[12][2]=[ _; WIN-7 ?
 	['ChannelAction_Checked','FALSE'], _
 	['CpsModeAction_Checked','FALSE'], _
 	['LogarithmicAction_Checked','FALSE'], _
@@ -46,21 +57,20 @@ local $mainform[12][2]=[ _; CZ_DWORD??/ WIN7 ?
 	['SpcChart_WindColor','clWhite'], _
 	['SpcChart_ElementLinesVisible','FALSE']]
 
-for $i = 0 to ubound($mainform) - 1
-	RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm', $mainform[$i], 'REG_SZ', $mainform[$i][0]) 
-next
+;for $i = 0 to ubound($mainform) - 1
+;	RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm', $mainform[$i][0], 'REG_SZ', $mainform[$i][1])
+;next
 
-;[HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\PTForm]
-local $ptform[4][2]=[ _; CZ_DWORD? / WIN7 ?
+local $ptform[5][2]=[ _
 	['KCheckBox_Checked','TRUE'], _
 	['LCheckBox_Checked','TRUE'], _
 	['MCheckBox_Checked','TRUE'], _
 	['TextCheckBox_Checked','TRUE'], _
 	['LineCheckBox_Checked','FALSE']]
 
-for $i = 0 to ubound($mainform) - 1
-	RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\PTForm', $ptform[$i], 'REG_SZ', $ptform[$i][0]) 
-next
+;for $i = 0 to ubound($ptform) - 1
+;	RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\PTForm', $ptform[$i][0], 'REG_SZ', $ptform[$i][1])
+;next
 
 EndFunc
 
@@ -77,10 +87,7 @@ func _Artax_GetSpectra($file)
 	return $name
 endfunc
 
-;
 ; Clipboard cleanup.
-;
-
 Func _Artax_GetClean()
 	_ClipBoard_Open(0)
 	if @error then return SetError(1,0,"Clip hook err.")
@@ -225,3 +232,6 @@ Func _Artax_GetGraphEx($spectrum,$export)
 
 	_ClipBoard_Close()
 EndFunc
+
+_Artax_Patch('c:\artax\program\Artax\ARTAX.ini')
+
