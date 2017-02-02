@@ -6,7 +6,6 @@
 #NoTrayIcon
 
 #include <GUIConstantsEx.au3>
-#include <_XMLDomWrapper.au3>
 #include <GUIComboBox.au3>
 #include <ArtaxHelper.au3>
 #include <File.au3>
@@ -72,6 +71,7 @@ While 1
 		elseif UBound($project_list) < 2 then
 			GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
 		else
+			; ---- patch ----
 			; ---- cleanup ----
 			_Artax_GetClean()
 			; ---- ATX ----
@@ -176,18 +176,6 @@ While 1
 		Exit; exit
 	endif
 WEnd
-
-func _Artax_GetSpectra($file)
-	_XMLLoadXML(FileRead($file))
-	if @error then return SetError(1,0,"XML instance error.")
-	$count = _XMLGetNodeCount('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance')
-	if @error then return SetError(1,0,"XML node count error.")
-	local $name[$count]
-	for $i = 1 to $count
-		$name[$i-1] = _XMLGetAttrib('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance[' & $i & ']', 'Name')
-	next
-	return $name
-endfunc
 
 func logger($text)
 	FileWriteLine($logfile, $text)
