@@ -1,6 +1,8 @@
 ;
 ; Helper clipboard data extraction function for Bruker Artax 400 binary program.
 ;
+; _Artax_Patch .............. Patch program registry and INI config.
+; _Artax_GetSpectra ......... Return project spectra names.
 ; _Artax_GetClean ........... Clean the clipboard.
 ; _Artax_GetTableEx ......... Clipboard CF_TEXT to CSV file.
 ; _Artax_GetPictureEx ....... Convert clipboard CF_DIB to BITMAP, encoded to PNG file.
@@ -8,8 +10,62 @@
 ;
 ;----------------------------
 
+#include <_XMLDomWrapper.au3>
 #include <Clipboard.au3>
 #include <GDIPlus.au3>
+
+func _Artax_Patch($file)
+
+;ARTAX.ini:
+
+;[Chart]
+;
+;FixedXL=0
+;FixedXH=0
+;FixedY=1
+;LowX=1
+;HighX=15
+;HighY=800
+
+if RegRead('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm') then
+;[HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm]
+
+;ChannelAction_Checked = FALSE
+;CpsModeAction_Checked = FALSE
+;LogarithmicAction_Checked = FALSE
+;ShowBackgrAction_Checked = FALSE
+;ShowCorrDataAction_Checked = FALSE
+;ShowDiffAction_Checked = FALSE
+;OnlyOneAction_Checked = TRUE
+;FilledAction_Checked = TRUE
+
+;"SpcChart_ChartColor"="clWhite"
+;"SpcChart_CursorType"="ctNone"
+;"SpcChart_WindColor"="clWhite"
+
+;"SpcChart_ElementLinesVisible"="FALSE"
+
+;[HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\PTForm]
+
+;"KCheckBox_Checked"="TRUE"
+;"LCheckBox_Checked"="TRUE"
+;"MCheckBox_Checked"="TRUE"
+;"TextCheckBox_Checked"="TRUE"
+;"LineCheckBox_Checked"="FALSE"
+EndFunc
+
+; Spectra name array from project XML file.
+func _Artax_GetSpectra($file)
+	_XMLLoadXML(FileRead($file))
+	if @error then return SetError(1,0,"XML instance error.")
+	$count = _XMLGetNodeCount('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance')
+	if @error then return SetError(1,0,"XML node count error.")
+	local $name[$count]
+	for $i = 1 to $count
+		$name[$i-1] = _XMLGetAttrib('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance[' & $i & ']', 'Name')
+	next
+	return $name
+endfunc
 
 ;
 ; Clipboard cleanup.
@@ -23,10 +79,7 @@ Func _Artax_GetClean()
 	_ClipBoard_Close()
 EndFunc
 
-;
 ; Get CSV from TEXT clipboard.
-;
-
 Func _Artax_GetTableEx($spectrum,$export)
 	if not _ClipBoard_IsFormatAvailable(1) then SetError(1,0,"Table clip format err: " & $spectrum); CF_TEXT
 
@@ -44,10 +97,7 @@ Func _Artax_GetTableEx($spectrum,$export)
 	_ClipBoard_Close()
 EndFunc
 
-;
 ; Get PNG image from DIB clipboard.
-;
-
 Func _Artax_GetPictureEx($spectrum,$export)
 	if not _ClipBoard_IsFormatAvailable(8) then return SetError(1,0,"Picture clip format err: " & $spectrum); CF_DIBV5
 
@@ -103,10 +153,7 @@ Func _Artax_GetPictureEx($spectrum,$export)
 	_ClipBoard_Close()
 EndFunc
 
-;
 ; Get PNG image from WMF clipboard.
-;
-
 Func _Artax_GetGraphEx($spectrum,$export)
 	if not _ClipBoard_IsFormatAvailable(3) then return SetError(1,0,"Graph clip format err: " & $spectrum); CF_METAFILEPICT
 
