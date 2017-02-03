@@ -2,7 +2,7 @@
 
 DESCRIPTION
 
-Bruker "Artax 400" XRF spectrometer data export wrapper.
+Bruker Artax 400 uXRF spectrometer data export wrapper.
 
 FILE
 

@@ -5,8 +5,8 @@ Sumerian tablet analysis database  & support software.
 
 SOFTWARE
 <pre>
-artax/ - Bruker Artax 400 XRF spectrometer export wrapper.
-color/ - CQ Report.
+artax/ - Bruker Artax 400 uXRF.
+color/ - X-Rite RM200CQ.
 </pre>
 CONTACT
 
