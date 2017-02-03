@@ -8,7 +8,6 @@
 #include <GUIConstantsEx.au3>
 #include <GUIComboBox.au3>
 #include <ArtaxHelper.au3>
-#include <File.au3>
 
 $runtime = @YEAR & @MON & @MDAY & 'T' & @HOUR & @MIN & @SEC
 $log = @scriptdir & '\ArtaxExport.log'
@@ -27,7 +26,7 @@ DirCreate(@scriptdir & '\export')
 if UBound(ProcessList(@ScriptName)) > 2 then exit; already running
 
 ;GUI
-$gui = GUICreate("ArtaxExport v 1.5", 351, 91)
+$gui = GUICreate("ArtaxExport v 1.6", 351, 91)
 $label_path = GUICtrlCreateLabel("Projekt:", 6, 10, 35, 21)
 $gui_path = GUICtrlCreateInput($path_history, 46, 8, 217, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
@@ -52,7 +51,7 @@ While 1
 		endif
 	EndIf
 	if $event = $button_exec Then; data path
-		$exec_path = FileOpenDialog("ArtaxExport/ Program file", @HomeDrive, "Artax program (*.exe)")
+		$exec_path = FileSelectFolder("ArtaxExport / Program directory", @HomeDrive)
 		if not @error then
 			GUICtrlSetData($gui_exec, $exec_path)
 			$exec_history = $exec_path; update last..
@@ -62,21 +61,24 @@ While 1
 		$project_list = _FileListToArray(GUICtrlRead($gui_path), "*.rtx", 1, True)
 		if GUICtrlRead($gui_path) == '' or GUICtrlRead($gui_exec) == '' then
 			GUICtrlSetData($gui_error, "Chyba: Prazdna cesta.")
-		elseif not FileExists(GUICtrlRead($gui_exec)) Then
-			GUICtrlSetData($gui_error, "Chyba: Program neexistuje.")
-		elseif UBound(ProcessList('ARTAX.exe')) >= 2 then
-			GUICtrlSetData($gui_error, "Chyba: Ukoncete bezici program.")
+		elseif not FileExists(GUICtrlRead($gui_exec) & '\ARTAX.exe') Then
+			GUICtrlSetData($gui_error, "Chyba: Program nenalezen.")
+		elseif not FileExists(GUICtrlRead($gui_exec) & '\ARTAX.ini') Then
+			GUICtrlSetData($gui_error, "Chyba: Konfigurace nenalezena.")
 		elseif not FileExists(GUICtrlRead($gui_path)) then
-			GUICtrlSetData($gui_error, "Chyba: Adresar neexistuje.")
+			GUICtrlSetData($gui_error, "Chyba: Adresar projektu neexistuje.")
 		elseif UBound($project_list) < 2 then
 			GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
+		elseif UBound(ProcessList('ARTAX.exe')) >= 2 then
+			GUICtrlSetData($gui_error, "Chyba: Ukoncete bezici program.")
 		else
 			; ---- patch ----
-			_Artax_Patch($inifile)
+			$patch = _Artax_Patch(GUICtrlRead($gui_exec) & '\ARTAX.ini')
+			if @error then logger($patch)
 			; ---- cleanup ----
 			_Artax_GetClean()
 			; ---- ATX ----
-			run(GUICtrlRead($gui_exec)); run artax executable
+			run(GUICtrlRead($gui_exec) & '\ARTAX.exe'); run artax executable
 			$atx = WinWait('ARTAX','',10); ATX handle
 			if not $atx then
 				logger("ATX program err.")

@@ -1,7 +1,7 @@
 ;
 ; Helper clipboard data extraction function for Bruker Artax 400 binary program.
 ;
-; _Artax_Patch .............. Patch program registry and INI config.
+; _Artax_Patch .............. Patch program registry and INI configuration.
 ; _Artax_GetSpectra ......... Return project spectra names.
 ; _Artax_GetClean ........... Clean the clipboard.
 ; _Artax_GetTableEx ......... Clipboard CF_TEXT to CSV file.
@@ -13,65 +13,69 @@
 #include <_XMLDomWrapper.au3>
 #include <Clipboard.au3>
 #include <GDIPlus.au3>
+#include <Array.au3>
 #include <File.au3>
 
+; Patch INI and registry.
 func _Artax_Patch($inifile)
-;ARTAX.ini [Chart]
-local $chart[6][2]=[ _
-	['FixedXL',0], _
-	['FixedXH',0], _
-	['FixedY',1], _
-	['LowX',1], _
-	['HighX',15], _
-	['HighY',800]]
+	local $chart[6][2]=[ _
+		['FixedXL',0], _
+		['FixedXH',0], _
+		['FixedY',1], _
+		['LowX',1], _
+		['HighX',15], _
+		['HighY',800]]
 
-$ini = FileOpen($inifile,256); rw no BOM
+	$ini = FileReadToArray($inifile)
+	if @error then return SetError(1,0,"Patch: INI read err.")
+	for $i = 0 to ubound($chart) - 1
+		$ichart = _ArraySearch($ini,'[Chart]')
+		if @error then $ichart = _ArrayAdd($ini,'[Chart]')
+		$ival = _ArraySearch($ini,$chart[$i][0] & '=.*',0,0,0,3); regexp scan..
+		if @error then
+			if $ichart = UBound($ini) - 1 then
+				_ArrayAdd($ini,$chart[$i][0] & '=' & $chart[$i][1])
+			else
+				_ArrayInsert($ini,$ichart + 1,$chart[$i][0] & '=' & $chart[$i][1])
+			endif
+		else
+			$ini[$ival] = $chart[$i][0] & '=' & $chart[$i][1]
+		endif
+	next
+	_FileWriteFromArray($inifile,$ini)
+	if @error then return SetError(1,0,"Patch: INI write err.")
 
-$buff = FileRead($ini)
+	local $mainform[15][2]=[ _; WIN-7 ?
+		['ChannelAction_Checked','FALSE'], _
+		['CpsModeAction_Checked','FALSE'], _
+		['LogarithmicAction_Checked','FALSE'], _
+		['ShowBackgrAction_Checked','FALSE'], _
+		['ShowCorrDataAction_Checked','FALSE'], _
+		['ShowDiffAction_Checked','FALSE'], _
+		['OnlyOneAction_Checked','TRUE'], _
+		['FilledAction_Checked','TRUE'], _
+		['SpcChart_ChartColor','clWhite'], _
+		['SpcChart_CursorType','ctNone'], _
+		['SpcChart_WindColor','clWhite'], _
+		['SpcChart_GridStyle','gsDotLines'], _
+		['SpcChart_GridMode','gmShortTicks'], _
+		['SpcChart_GridColor','clSilver'], _
+		['SpcChart_ElementLinesVisible','FALSE']]
 
-MsgBox(Default,"in",$buff)
+	for $i = 0 to ubound($mainform) - 1
+		RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm', $mainform[$i][0], 'REG_SZ', $mainform[$i][1])
+	next
 
-for $i = 0 to ubound($chart) - 1
-	StringRegExpReplace($buff,'(.*)(' & $chart[$i][0] & '=\d+)(.*)', '$1' & $chart[$i][0] & '=' & $chart[$i][1] & '$3')
+	local $ptform[5][2]=[ _
+		['KCheckBox_Checked','TRUE'], _
+		['LCheckBox_Checked','TRUE'], _
+		['MCheckBox_Checked','TRUE'], _
+		['TextCheckBox_Checked','TRUE'], _
+		['LineCheckBox_Checked','FALSE']]
 
-;	check line -> replace -> else
-;	check chart -> insert else
-;	create chart -> insert
-next
-
-MsgBox(Default,"out",$buff)
-
-;FileWrite($ini,$buff)
-
-local $mainform[12][2]=[ _; WIN-7 ?
-	['ChannelAction_Checked','FALSE'], _
-	['CpsModeAction_Checked','FALSE'], _
-	['LogarithmicAction_Checked','FALSE'], _
-	['ShowBackgrAction_Checked','FALSE'], _
-	['ShowCorrDataAction_Checked','FALSE'], _
-	['ShowDiffAction_Checked','FALSE'], _
-	['OnlyOneAction_Checked','TRUE'], _
-	['FilledAction_Checked','TRUE'], _
-	['SpcChart_ChartColor','clWhite'], _
-	['SpcChart_CursorType','ctNone'], _
-	['SpcChart_WindColor','clWhite'], _
-	['SpcChart_ElementLinesVisible','FALSE']]
-
-;for $i = 0 to ubound($mainform) - 1
-;	RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm', $mainform[$i][0], 'REG_SZ', $mainform[$i][1])
-;next
-
-local $ptform[5][2]=[ _
-	['KCheckBox_Checked','TRUE'], _
-	['LCheckBox_Checked','TRUE'], _
-	['MCheckBox_Checked','TRUE'], _
-	['TextCheckBox_Checked','TRUE'], _
-	['LineCheckBox_Checked','FALSE']]
-
-;for $i = 0 to ubound($ptform) - 1
-;	RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\PTForm', $ptform[$i][0], 'REG_SZ', $ptform[$i][1])
-;next
-
+	for $i = 0 to ubound($ptform) - 1
+		RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\PTForm', $ptform[$i][0], 'REG_SZ', $ptform[$i][1])
+	next
 EndFunc
 
 ; Spectra name array from project XML file.
@@ -232,6 +236,3 @@ Func _Artax_GetGraphEx($spectrum,$export)
 
 	_ClipBoard_Close()
 EndFunc
-
-_Artax_Patch('c:\artax\program\Artax\ARTAX.ini')
-
