@@ -7,11 +7,9 @@ Spectra graph/data generator from QCREPORT CSV output.
 FILE
 
 <pre>
-             col.py - Demo file.
            color.py - Main script.
-           plots.py - Custom graph function.
+        diagrams.py - Modified library function.
    colour-0.3.8.zip - Colour library by Colour Developers (c) 2013-2016
-ColorPy-v.0.1.2.zip - Color library by Mark Kness Copyright (c) 2008
 </pre>
 
 CONTACT
