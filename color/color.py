@@ -52,7 +52,7 @@ try:# DIAGRAM
 
 		CIE_1976_UCS_chromaticity_diagram_plot(Lab,\
 			filename='export/' + ln[0] + '_1976.png', \
-			figure_size=(10,6), \
+			figure_size=(6,6), \
 			title='CIE 1976 Chromaticity Diagram - ' + ln[0] \
 		)
 
