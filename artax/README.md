@@ -8,7 +8,7 @@ FILE
 
 <pre>
    ArtaxExport.au3 - Main program.
-   ArtaxHelper.au3 - Helper clipboard functions.
+   ArtaxHelper.au3 - Helper functions.
 _XMLDomWrapper.au3 - XML library by Stephen Podhajecki.
          artax.ico - Program icon. 
   artax_screen.png - Screenshot.
