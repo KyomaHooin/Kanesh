@@ -51,13 +51,13 @@ try:# DIAGRAM
 		Lab_sRGB = XYZ_to_sRGB(Lab_to_XYZ(Lab,illuminant),illuminant)
 
 		CIE_1976_UCS_chromaticity_diagram_plot(Lab,\
-			filename='export/' + ln[0] + '_1976.png', \
+			filename='export/' + ln[0].replace(' ','_') + '_1976.png', \
 			figure_size=(6,6), \
 			title='CIE 1976 Chromaticity Diagram - ' + ln[0] \
 		)
 
 		single_colour_plot(ColourParameter(RGB=Lab_sRGB), \
-			filename='export/' + ln[0] + '_sRGB.png', \
+			filename='export/' + ln[0].replace(' ','_') + '_sRGB.png', \
 			figure_size=(4,4), \
 			title='Lab to sRGB color - ' + ln[0] \
 		)
