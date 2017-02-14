@@ -24,7 +24,7 @@ func _Artax_Patch($inifile)
 		['FixedY',1], _
 		['LowX',1], _
 		['HighX',15], _
-		['HighY',800]]
+		['HighY',8000]]
 
 	$ini = FileReadToArray($inifile)
 	if @error then return SetError(1,0,"Patch: INI read err.")
@@ -58,7 +58,7 @@ func _Artax_Patch($inifile)
 		['SpcChart_CursorType','ctNone'], _
 		['SpcChart_WindColor','clWhite'], _
 		['SpcChart_GridStyle','gsDotLines'], _
-		['SpcChart_GridMode','gmShortTicks'], _
+		['SpcChart_GridMode','gmLongTicks'], _
 		['SpcChart_GridColor','clSilver'], _
 		['SpcChart_ElementLinesVisible','FALSE']]
 
