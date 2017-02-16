@@ -68,8 +68,8 @@ func _Artax_Patch($inifile)
 
 	local $ptform[5][2]=[ _
 		['KCheckBox_Checked','TRUE'], _
-		['LCheckBox_Checked','TRUE'], _
-		['MCheckBox_Checked','TRUE'], _
+		['LCheckBox_Checked','FALSE'], _
+		['MCheckBox_Checked','FALSE'], _
 		['TextCheckBox_Checked','TRUE'], _
 		['LineCheckBox_Checked','FALSE']]
 

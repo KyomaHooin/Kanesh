@@ -26,7 +26,7 @@ DirCreate(@scriptdir & '\export')
 if UBound(ProcessList(@ScriptName)) > 2 then exit; already running
 
 ;GUI
-$gui = GUICreate("ArtaxExport v 1.6", 351, 91)
+$gui = GUICreate("ArtaxExport v 1.7", 351, 91)
 $label_path = GUICtrlCreateLabel("Projekt:", 6, 10, 35, 21)
 $gui_path = GUICtrlCreateInput($path_history, 46, 8, 217, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
@@ -133,6 +133,14 @@ While 1
 							;---- spectra ----
 							for $k = 0 to UBound($spectra_name) - 1
 								Send('{DOWN}')
+								;---- periodic table ----
+								if $k = 0 then
+									sleep(500)
+									Send('^t')
+									$pt = WinWait('Periodic Table of the Elements','', 10)
+									Send('llmm')
+									WinClose($pt)
+								EndIf
 								;---- table ----
 								Send('^d')
 								sleep(500)
