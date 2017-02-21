@@ -19,10 +19,10 @@
 ; Patch INI and registry.
 func _Artax_Patch($inifile)
 	local $chart[6][2]=[ _
-		['FixedXL',0], _
-		['FixedXH',0], _
+		['FixedXL',1], _
+		['FixedXH',1], _
 		['FixedY',1], _
-		['LowX',1], _
+		['LowX',0.3], _
 		['HighX',15], _
 		['HighY',8000]]
 
