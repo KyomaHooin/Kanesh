@@ -11,5 +11,5 @@ color/ - X-Rite RM200CQ.
 CONTACT
 
 Author: richard_bruna@nm.cz<br>
-Source: https://github.com/KyomaHooin/Amusing
+Source: https://github.com/KyomaHooin/Sumerian
 
