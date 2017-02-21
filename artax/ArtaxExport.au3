@@ -116,7 +116,6 @@ While 1
 							WinSetState($atx_child,'',@SW_MAXIMIZE)
 							WinActivate($atx_child)
 							WinWaitActive($atx_child,'',15)
-							Send(100)
 							Send('!fo')
 							WinWaitActive("Open Project",'',5)
 							Sleep(100); hold on a micro
