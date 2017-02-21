@@ -26,7 +26,7 @@ DirCreate(@scriptdir & '\export')
 if UBound(ProcessList(@ScriptName)) > 2 then exit; already running
 
 ;GUI
-$gui = GUICreate("ArtaxExport v 1.7", 351, 91)
+$gui = GUICreate("ArtaxExport v 1.8", 351, 91)
 $label_path = GUICtrlCreateLabel("Projekt:", 6, 10, 35, 21)
 $gui_path = GUICtrlCreateInput($path_history, 46, 8, 217, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
@@ -116,10 +116,19 @@ While 1
 							WinSetState($atx_child,'',@SW_MAXIMIZE)
 							WinActivate($atx_child)
 							WinWaitActive($atx_child,'',15)
+							Send(100)
 							Send('!fo')
 							WinWaitActive("Open Project",'',5)
+							Sleep(100); hold on a micro
 							Send($project_list[$i])
 							Send('!o')
+							Sleep(100)
+							$openerr = WinGetHandle('','')
+							if WinGetTitle($openerr,'') == 'Error' Then
+								logger("Open project err: " & $project_list[$i])
+								WinClose($openerr)
+								ContinueLoop
+							endif
 							; ---- project ----
 							$project = StringRegExpReplace($project_list[$i],".*\\(.*).rtx$","$1")
 							DirCreate(@ScriptDir & '\export\' & $project)
@@ -137,7 +146,8 @@ While 1
 								if $k = 0 then
 									sleep(500)
 									Send('^t')
-									$pt = WinWait('Periodic Table of the Elements','', 10)
+									$pt = WinWaitActive('Periodic Table of the Elements','', 10)
+									Sleep(100); hold on a micro
 									Send('llmm')
 									WinClose($pt)
 								EndIf
