@@ -1,0 +1,24 @@
+
+INSTALL
+-------
+
+a] Install LAS 410 full instalation.
+
+b] Reboot.
+
+c] Install Leica IEEE 1394 FireWire PCI/PCIe drivers
+   from Firmware configuration utility.
+
+d] Install "imaging devices" camera generic Leica DFC driver.
+
+e] Run Camera diagnostic tool.
+
+f] Run LAS.
+
+   Hardware setup:
+
+   Microscope - [?FA24?] -> automotor + COM1 -> [test]
+   Camera     - [DFC940] -> [test]
+
+g] Done.
+
