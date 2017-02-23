@@ -22,3 +22,5 @@ f] Run LAS.
 
 g] Done.
 
+i] Edit HW config -> Hardware configuration utility -> "run as administrator".
+
