@@ -111,7 +111,7 @@ Func _Artax_GetTableEx($spectrum,$export)
 	if @error then return SetError(1,0,"Table get err: " & $spectrum)
 	$tab = FileOpen($export & '\' & $spectrum & '.csv', 258); UTF-8 no BOM overwrite
 	if @error then return SetError(1,0,"Table file open err: " & $spectrum)
-	FileWrite($tab, $TEXT)
+	FileWrite($tab, StringRegExpReplace($TEXT, ' *\t+ *', ','))
 	if @error then return SetError(1,0,"Table file write err: " & $spectrum)
 	FileClose($tab)
 
