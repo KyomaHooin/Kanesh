@@ -7,7 +7,7 @@ SOFTWARE
 <pre>
 artax/ - Bruker Artax 400 uXRF.
 color/ - X-Rite RM200CQ.
-leica/ - Leica ?? microscope and DFC940 camera.
+leica/ - Leica MZ16FA microscope and DFC490 camera.
 </pre>
 CONTACT
 

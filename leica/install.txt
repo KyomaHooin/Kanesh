@@ -17,8 +17,8 @@ f] Run LAS.
 
    Hardware setup:
 
-   Microscope - [?FA24?] -> automotor + COM1 -> [test]
-   Camera     - [DFC940] -> [test]
+   Microscope - [MZ16FA] -> automotor + COM1 -> [test]
+   Camera     - [DFC490] -> [test]
 
 g] Done.
 
