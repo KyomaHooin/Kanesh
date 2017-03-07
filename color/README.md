@@ -23,7 +23,8 @@ WSGIApplicationGroup %{GLOBAL}
 </pre>
 FILE
 <pre>
-             web/ - WSGI frontend.
+   web/color.png  - Logo by Colour Developers (c) 2013-2016
+   web/color.wsgi - WSGI frontend.
 
       diagrams.py - Modified library function.
  color_screen.png - Lab to sRGB color.

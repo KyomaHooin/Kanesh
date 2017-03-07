@@ -22,11 +22,15 @@ html = """
 </body>
 </html>
 """
+status = '200 OK'
 
 buff = StringIO.StringIO()
+zbuff = StringIO.StringIO()
 
-csv = open('/var/www/color/data.csv','w')
-log = open('/var/www/color/color.log','a')
+#csv = open('/var/www/color/data.csv','w')
+log = open('/var/www/color/color.log','a',)
+
+payload = gzip.GzipFile(fileobj=zbuff,mode='wb')
 
 #-------------
 
@@ -49,25 +53,33 @@ def application(environ, start_response):
 		buff.write(request_body)
 		buff.seek(0)
 
-	# CGI parse
 	form = cgi.FieldStorage(fp=buff, environ=environ, keep_blank_values=True)
-	
+
 	if 'file' in form.keys():
 		if is_csv(form['file'].value):
-			csv.write(form['file'].value)
-			log.write('ok\n')
+			payload.write(form['file'].value)
+			payload.close()
+			#csv.write(form['file'].value)
+			#csv.close()
 
-
-		else: log.write('fail\n')	
-
-	csv.close()
-	buff.close()
+	zbuff.seek(0)# return godamnit
+	log.write(str(zbuff.len) + '\n')
 	log.close()
 
-	status = '200 OK'
+	if zbuff.len > 10: # empty GZIP header
+		if 'wsgi.file_wrapper' in environ:
+			response_headers = [
+				('Content-type','application/octet-stream'),
+				('Content-Length', str(zbuff.len)),
+				('Content-Disposition', 'attachment; filename=demo.gz')
+			]
+			start_response(status, response_headers)
+			return environ['wsgi.file_wrapper'](zbuff, 1024)
+	else:
+		response_headers = [
+			('Content-type', 'text/html'),
+			('Content-Length',str(len(html)))
+		]
+		start_response(status, response_headers)
+		return [html]
 
-	response_headers = [('Content-type', 'text/html'),('Content-Length',str(len(html)))]
-
-	start_response(status, response_headers)
-
-	return [html]
