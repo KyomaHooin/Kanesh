@@ -4,10 +4,27 @@ DESCRIPTION
 
 Spectra graph/data generator from QCREPORT CSV output.  
 
-FILE
-
+INSTALL
 <pre>
-         color.py - Main script.
+apt-get install python-numpy python-scipy python-matplotlib libapache2-mod-wsgi
+</pre>
+CONFIG
+<pre>
+/etc/apache2/sites-enabled/default-ssl.conf:
+
+<Directory /var/www/media>
+    Options -Indexes -Multiviews
+    Order allow,deny
+    Allow from all
+</Directory>
+
+WSGIScriptAlias /color /var/www/color/color.wsgi
+WSGIApplicationGroup %{GLOBAL}
+</pre>
+FILE
+<pre>
+             web/ - WSGI frontend.
+
       diagrams.py - Modified library function.
  color_screen.png - Lab to sRGB color.
 chroma_screen.png - Lab to uv chromaticity UCS 1976 diagram. 
