@@ -4,6 +4,10 @@ DESCRIPTION
 
 Spectra graph/data generator from QCREPORT CSV output.  
 
+TODO
+
+-dynamic StringIO creation => multiple CSV line
+
 INSTALL
 <pre>
 apt-get install python-numpy python-scipy python-matplotlib libapache2-mod-wsgi
