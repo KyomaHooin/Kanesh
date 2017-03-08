@@ -12,7 +12,7 @@ from colour.models import Lab_to_XYZ,XYZ_to_sRGB
 
 html_head = """
 <html>
-<head></head>
+<head><meta charset="utf-8"></head>
 <body>
 <img width="500" src="/media/color.png">
 <br><p style="padding-left: 42px;">[ Formát CSV: <b>ID;L;a;b</b> ]</p>
