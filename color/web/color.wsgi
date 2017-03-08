@@ -24,7 +24,6 @@ html_head = """
 html_msg = ''
 
 html_foot = """
-</div>
 </body>
 </html>
 """
