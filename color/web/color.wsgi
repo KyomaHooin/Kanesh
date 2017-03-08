@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import matplotlib,StringIO,numpy,zipfile,cgi
+import matplotlib,StringIO,zipfile,numpy,time,cgi
 
 matplotlib.use('Agg')# no display
 
@@ -21,8 +21,6 @@ html_head = """
 </form>
 """
 
-html_msg = ''
-
 html_foot = """
 </body>
 </html>
@@ -30,19 +28,13 @@ html_foot = """
 
 status = '200 OK'
 
-hbuff = StringIO.StringIO()
-zbuff = StringIO.StringIO()
-
-payload = zipfile.ZipFile(zbuff, mode='a', compression=zipfile.ZIP_DEFLATED)
-
 illuminant = DEFAULT_PLOTTING_ILLUMINANT# D65
 
 #-------------
 
-def plot_data(data):
+def plot_data(data,out):
 	try:
 		for line in data.splitlines():
-
 			img1_buff = StringIO.StringIO()
 			img2_buff = StringIO.StringIO()
 		
@@ -52,27 +44,29 @@ def plot_data(data):
 
 			Lab_sRGB = XYZ_to_sRGB(Lab_to_XYZ(Lab,illuminant),illuminant)
 
-			CIE_1976_UCS_chromaticity_diagram_plot(Lab,filename=img1_buff,figure_size=(6,6), \
+			CIE_1976_UCS_chromaticity_diagram_plot(
+				Lab, \
+				filename=img1_buff, \
+				figure_size=(6,6), \
 				title='CIE 1976 Chromaticity Diagram - ' + ln[0]
 			)
 
-			payload.writestr(ln[0] + '_1976.png',img1_buff.getvalue())
-
+			out.writestr(ln[0] + '_1976.png',img1_buff.getvalue())
 			img1_buff.close()
-	
-			single_colour_plot(ColourParameter(RGB=Lab_sRGB),filename=img2_buff,figure_size=(4,4), \
+
+			single_colour_plot(
+				ColourParameter(RGB=Lab_sRGB), \
+				filename=img2_buff, \
+				figure_size=(4,4), \
 				title='Lab to sRGB color - ' + ln[0]
 			)
-
-			payload.writestr(ln[0] + '_sRGB.png',img2_buff.getvalue())
-	
+		
+			out.writestr(ln[0] + '_sRGB.png',img2_buff.getvalue())
 			img2_buff.close()
 	except:
 		html_msg = '<font style="padding-left: 42px;" color="red">Chyba při generování grafů.</font>'
-		
 
 def is_csv(data):
-	if not data: return 0
 	for line in data.splitlines():
 		if len(line.split(';')) != 4: return 0
 	return 1
@@ -86,31 +80,37 @@ def application(environ, start_response):
 
 	request_body = environ['wsgi.input'].read(request_body_size)
 
+	body_buff = StringIO.StringIO()
+
 	if request_body:
-		hbuff.write(request_body)
-		hbuff.seek(0)
+		body_buff.write(request_body)
+		body_buff.seek(0)
 
-	form = cgi.FieldStorage(fp=hbuff, environ=environ, keep_blank_values=True)
+	form = cgi.FieldStorage(fp=body_buff, environ=environ, keep_blank_values=True)
 
-	html_msg=''
+	html_msg = ''
+	
+	zip_buff = StringIO.StringIO()
 
 	if 'file' in form.keys():
-		if is_csv(form['file'].value):
-			plot_data(form['file'].value.decode('utf-8'))
-			payload.close()
-			zbuff.seek(0)
-		else:
-			html_msg = '<font style="padding-left: 42px;" color="red">Neplatné CSV.</font>'
+		if form['file'].value:
+			if is_csv(form['file'].value):
+				payload = zipfile.ZipFile(zip_buff, mode='a', compression=zipfile.ZIP_DEFLATED)
+				plot_data(form['file'].value.decode('utf-8'),payload)
+				payload.close()
+				zip_buff.seek(0)
+			else:
+				html_msg = '<font style="padding-left: 42px;" color="red">Neplatné CSV.</font>'
 
-	if zbuff.len: # empty GZIP header
+	if zip_buff.len > 22: # empty ZIP header
 		if 'wsgi.file_wrapper' in environ:
 			response_headers = [
 				('Content-type','application/octet-stream'),
-				('Content-Length', str(zbuff.len)),
-				('Content-Disposition', 'attachment; filename=export.zip')
+				('Content-Length', str(zip_buff.len)),
+				('Content-Disposition', 'attachment; filename=export_'+time.strftime("%Y%m%d_%H%M%S")+'.zip')
 			]
 			start_response(status, response_headers)
-			return environ['wsgi.file_wrapper'](zbuff, 1024)
+			return environ['wsgi.file_wrapper'](zip_buff, 1024)
 	else:
 		response_headers = [
 			('Content-type', 'text/html'),
