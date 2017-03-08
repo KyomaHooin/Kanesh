@@ -15,9 +15,9 @@ html_head = """
 <head></head>
 <body>
 <img width="500" src="/media/color.png">
-<br>
-<form style="padding-left: 42px; padding-top: 23px;" enctype="multipart/form-data" action="color" method="post">
-<b>CSV soubor</b>: <input type="file" name="file"> <input type="submit" value="Export">
+<br><p style="padding-left: 42px;">[ Format CSV: <b>ID;L;a;b</b> ]</p>
+<form style="padding-left: 42px;" enctype="multipart/form-data" action="color" method="post">
+<b>Soubor CSV</b>: <input style="background-color:#ddd;" type="file" name="file"> <input type="submit" value="Export">
 </form>
 """
 
@@ -33,9 +33,6 @@ status = '200 OK'
 hbuff = StringIO.StringIO()
 zbuff = StringIO.StringIO()
 
-i1_buff = StringIO.StringIO()
-i2_buff = StringIO.StringIO()
-
 #log = open('/var/www/color/color.log','a',0)
 
 payload = zipfile.ZipFile(zbuff, mode='a', compression=zipfile.ZIP_DEFLATED)
@@ -44,29 +41,38 @@ illuminant = DEFAULT_PLOTTING_ILLUMINANT# D65
 
 #-------------
 
-def plot_data(l):
-	ln = l.split(';')
+def plot_data(data):
+	try:
+		for line in data.splitlines():
 
-	Lab = numpy.array([float(ln[1]),float(ln[2]),float(ln[3])])
+			img1_buff = StringIO.StringIO()
+			img2_buff = StringIO.StringIO()
+		
+			ln = line.split(';')
 
-	Lab_sRGB = XYZ_to_sRGB(Lab_to_XYZ(Lab,illuminant),illuminant)
+			Lab = numpy.array([float(ln[1]),float(ln[2]),float(ln[3])])
 
-	CIE_1976_UCS_chromaticity_diagram_plot(Lab,filename=i1_buff,figure_size=(6,6), \
-		title='CIE 1976 Chromaticity Diagram - ' + ln[0]
-	)
+			Lab_sRGB = XYZ_to_sRGB(Lab_to_XYZ(Lab,illuminant),illuminant)
 
-	payload.writestr(ln[0] + '_1976.png',i1_buff.getvalue())
+			CIE_1976_UCS_chromaticity_diagram_plot(Lab,filename=img1_buff,figure_size=(6,6), \
+				title='CIE 1976 Chromaticity Diagram - ' + ln[0]
+			)
 
-	i1_buff.close()
+			payload.writestr(ln[0] + '_1976.png',img1_buff.getvalue())
+
+			img1_buff.close()
 	
-	single_colour_plot(ColourParameter(RGB=Lab_sRGB),filename=i2_buff,figure_size=(4,4), \
-		title='Lab to sRGB color - ' + ln[0]
-	)
+			single_colour_plot(ColourParameter(RGB=Lab_sRGB),filename=img2_buff,figure_size=(4,4), \
+				title='Lab to sRGB color - ' + ln[0]
+			)
 
-	payload.writestr(ln[0] + '_sRGB.png',i2_buff.getvalue())
+			payload.writestr(ln[0] + '_sRGB.png',img2_buff.getvalue())
 	
-	i1_buff.close()
-	payload.close()
+			img2_buff.close()
+			#payload.close()
+	except:
+		html_msg = '<font style="padding-left: 42px;" color="red">Chyba při generování grafů.</font>'
+		
 
 def is_csv(data):
 	if not data: return 0
@@ -93,13 +99,12 @@ def application(environ, start_response):
 
 	if 'file' in form.keys():
 		if is_csv(form['file'].value):
-			for line in form['file'].value.splitlines():
-				plot_data(line)
-				#log.write(str(zbuff.len)+'\n')
+			plot_data(form['file'].value.decode('utf-8'))
+			payload.close()
+			zbuff.seek(0)
+			#log.write(str(zbuff.len)+'\n')
 		else:
-			html_msg = '<font style="padding-left: 42px;" color="red">Neplatny vstup.</font>'
-
-	zbuff.seek(0)# return godamnit
+			html_msg = '<font style="padding-left: 42px;" color="red">Neplatné CSV.</font>'
 
 	if zbuff.len: # empty GZIP header
 		if 'wsgi.file_wrapper' in environ:
