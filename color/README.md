@@ -6,7 +6,7 @@ Spectra graph/data generator from QCREPORT CSV output.
 
 TODO
 
--dynamic StringIO creation => multiple CSV line
+-screen, testing
 
 INSTALL
 <pre>
