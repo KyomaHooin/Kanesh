@@ -27,12 +27,11 @@ html_foot = """
 </body>
 </html>
 """
+
 status = '200 OK'
 
 hbuff = StringIO.StringIO()
 zbuff = StringIO.StringIO()
-
-#log = open('/var/www/color/color.log','a',0)
 
 payload = zipfile.ZipFile(zbuff, mode='a', compression=zipfile.ZIP_DEFLATED)
 
@@ -68,7 +67,6 @@ def plot_data(data):
 			payload.writestr(ln[0] + '_sRGB.png',img2_buff.getvalue())
 	
 			img2_buff.close()
-			#payload.close()
 	except:
 		html_msg = '<font style="padding-left: 42px;" color="red">Chyba při generování grafů.</font>'
 		
@@ -101,7 +99,6 @@ def application(environ, start_response):
 			plot_data(form['file'].value.decode('utf-8'))
 			payload.close()
 			zbuff.seek(0)
-			#log.write(str(zbuff.len)+'\n')
 		else:
 			html_msg = '<font style="padding-left: 42px;" color="red">Neplatné CSV.</font>'
 
