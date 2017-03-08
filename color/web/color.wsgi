@@ -72,7 +72,6 @@ def is_csv(data):
 	return 1
 
 def application(environ, start_response):
-
 	try:
 		request_body_size = int(environ.get('CONTENT_LENGTH', 0))
 	except ValueError:
@@ -107,7 +106,7 @@ def application(environ, start_response):
 			response_headers = [
 				('Content-type','application/octet-stream'),
 				('Content-Length', str(zip_buff.len)),
-				('Content-Disposition', 'attachment; filename=export_'+time.strftime("%Y%m%d_%H%M%S")+'.zip')
+				('Content-Disposition', 'attachment; filename=color_'+time.strftime("%Y%m%d_%H%M%S")+'.zip')
 			]
 			start_response(status, response_headers)
 			return environ['wsgi.file_wrapper'](zip_buff, 1024)
