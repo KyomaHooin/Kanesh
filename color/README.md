@@ -9,18 +9,18 @@ INSTALL
 apt-get install python-numpy python-scipy python-matplotlib libapache2-mod-wsgi
 </pre>
 CONFIG
-<code>
+<pre>
 /etc/apache2/sites-enabled/default-ssl.conf:
 
-[Directory /var/www/media>
+&lt;Directory /var/www/media&gt;
     Options -Indexes -Multiviews
     Order allow,deny
     Allow from all
-</Directory>
+&lt;/Directory&gt;
 
 WSGIScriptAlias /color /var/www/color/color.wsgi
 WSGIApplicationGroup %{GLOBAL}
-</code>
+</pre>
 FILE
 <pre>
    web/color.png  - Logo by Colour Developers (c) 2013-2016
