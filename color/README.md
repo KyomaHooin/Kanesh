@@ -4,19 +4,15 @@ DESCRIPTION
 
 Spectra graph/data generator from QCREPORT CSV output.  
 
-TODO
-
--screen, testing
-
 INSTALL
 <pre>
 apt-get install python-numpy python-scipy python-matplotlib libapache2-mod-wsgi
 </pre>
 CONFIG
-<pre>
+<code>
 /etc/apache2/sites-enabled/default-ssl.conf:
 
-<Directory /var/www/media>
+[Directory /var/www/media>
     Options -Indexes -Multiviews
     Order allow,deny
     Allow from all
@@ -24,7 +20,7 @@ CONFIG
 
 WSGIScriptAlias /color /var/www/color/color.wsgi
 WSGIApplicationGroup %{GLOBAL}
-</pre>
+</code>
 FILE
 <pre>
    web/color.png  - Logo by Colour Developers (c) 2013-2016
