@@ -64,7 +64,7 @@ def plot_data(data,out):
 			out.writestr(ln[0] + '_sRGB.png',img2_buff.getvalue())
 			img2_buff.close()
 	except:
-		html_msg = '<font style="padding-left: 42px;" color="red">Chyba při generování grafů.</font>'
+		return '<font style="padding-left: 42px;" color="red">Chyba při generování grafu.</font>'
 
 def is_csv(data):
 	for line in data.splitlines():
@@ -95,7 +95,7 @@ def application(environ, start_response):
 		if form['file'].value:
 			if is_csv(form['file'].value):
 				payload = zipfile.ZipFile(zip_buff, mode='a', compression=zipfile.ZIP_DEFLATED)
-				plot_data(form['file'].value.decode('utf-8'),payload)
+				html_msg = plot_data(form['file'].value.decode('utf-8'),payload)
 				payload.close()
 				zip_buff.seek(0)
 			else:
