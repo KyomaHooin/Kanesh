@@ -13,12 +13,11 @@
 
 ;VAR
 
-$mapping = @ScriptDir & '\artax_nazvy.txt'
-local $map; mapping array
+$mapping = @ScriptDir & '\spectra.txt'
 
 ;CONTROL
 ;already running
-if UBound(ProcessList(@ScriptName)) > 2 then Exit
+If UBound(ProcessList(@ScriptName)) > 2 Then Exit
 
 ;GUI
 $gui = GUICreate("ArtaxRename v 1.0", 356, 91)
@@ -30,48 +29,60 @@ $button_export = GUICtrlCreateButton("Oprava", 193, 63, 75, 21)
 $button_exit = GUICtrlCreateButton("Konec", 275, 63, 75, 21)
 
 ;GUI INIT
-GUICtrlSetState($button_path,$GUI_FOCUS)
+GUICtrlSetState($button_path, $GUI_FOCUS)
 GUISetState(@SW_SHOW)
 
 While 1
-	$event = GUIGetMsg(); catch event
-	if $event = $button_path Then; data path
+	$event = GUIGetMsg() ; catch event
+	If $event = $button_path Then ; data path
 		$export_path = FileSelectFolder("Artax/Export Directory", @HomeDrive, Default)
-		if not @error then
-				GUICtrlSetData($gui_path, $export_path)
-		endif
+		If Not @error Then
+			GUICtrlSetData($gui_path, $export_path)
+		EndIf
 	EndIf
-	if $event = $button_export Then; rename
-		if GUICtrlRead($gui_path) == '' then
+	If $event = $button_export Then ; rename
+		Local $map
+		_FileReadToArray($mapping, $map, 0)
+		If @error Then
+			GUICtrlSetData($gui_error, "Chyba: Nacteni seznamu selhalo.")
+		ElseIf GUICtrlRead($gui_path) == '' Then
 			GUICtrlSetData($gui_error, "Chyba: Prazdna cesta.")
-		Elseif not FileExists(GUICtrlRead($gui_path)) Then
+		ElseIf Not FileExists(GUICtrlRead($gui_path)) Then
 			GUICtrlSetData($gui_error, "Chyba: Adresar neexistuje.")
-		else
-			_FileReadToArray($mapping, $map, 0)
-			if @error then
-				GUICtrlSetData($gui_error, "Chyba: Nacteni mapy selhalo.")
-			else
-				$filelist = _FileListToArrayRec(GUICtrlRead($gui_path), 'tab*.*',1,1,1,2); recursion, files only, sorted, fullpath..
-				if ubound($filelist) < 2 then
-					GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
-				else
-					for $i=1 to UBound($filelist) - 1
-						GUICtrlSetData($gui_progress, round( $i / (UBound($filelist) - 1) * 100)); update progress
-						GUICtrlSetData($gui_error, StringRegExpReplace($filelist[$i], ".*\\(.*)$", "$1"))
-						sleep(50)
-					next
-					GUICtrlSetData($gui_progress,0); clear progress
-					GUICtrlSetData($gui_error, "Hotovo!")
-				endif
-			endif
-		endif
-	endif
-	If $event = $GUI_EVENT_CLOSE or $event = $button_exit then
-		Exit; exit
-	endif
+		Else
+			;			_ArrayDisplay($map)
+			$filelist = _FileListToArrayRec(GUICtrlRead($gui_path), 'tab*.*', 1, 1, 1, 2) ; recursion, files only, sorted, fullpath..
+			If UBound($filelist) < 2 Then
+				GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
+			Else
+				;				_ArrayDisplay($filelist)
+				For $i = 1 To UBound($filelist) - 1
+					GUICtrlSetData($gui_progress, Round($i / (UBound($filelist) - 1) * 100)) ; update progress
+					GUICtrlSetData($gui_error, StringRegExpReplace($filelist[$i], ".*\\(.*)$", "$1"))
+					MsgBox(Default, "orig", StringRegExpReplace($filelist[$i], ".*\\(.*)(_graph)?\..*$", "$1"))
+					$name = get_spectra(StringRegExpReplace($filelist[$i], ".*\\(.*)(_graph)?\..*$", "$1"), $map)
+					MsgBox(Default, "name", $name)
+					If $name Then
+						MsgBox(Default, "ren", $filelist[$i] & " to " & StringRegExpReplace($filelist[$i], "(.*\\)(.*)(_.*)$", "$1" & $name & "$3"))
+						;FileMove($filelist[$i],StringRegExpReplace($filelist[$i], "(.*\\)(.*)(_.*)$", "$1" & $name & "$2"))
+					Else
+						ContinueLoop
+					EndIf
+					Sleep(50)
+				Next
+				GUICtrlSetData($gui_progress, 0) ; clear progress
+				GUICtrlSetData($gui_error, "Hotovo!")
+			EndIf
+		EndIf
+	EndIf
+	If $event = $GUI_EVENT_CLOSE Or $event = $button_exit Then
+		Exit ; exit
+	EndIf
 WEnd
 
-func get_map()
-	;load file
-	;test data
+Func get_spectra($sid, $map)
+	For $i = 0 To UBound($map) - 1
+		If $sid == StringSplit($map[$i], ';', 2)[0] Then Return StringSplit($map[$i], ';', 2)[1]
+	Next
 EndFunc
+
