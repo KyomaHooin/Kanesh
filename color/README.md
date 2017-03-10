@@ -1,4 +1,4 @@
-![Chroma](https://github.com/KyomaHooin/Sumerian/raw/master/color/chroma_screen.png "screenshot") ![Color](https://github.com/KyomaHooin/Sumerian/raw/master/color/color_screen.png "screenshot")
+![Color](https://github.com/KyomaHooin/Sumerian/raw/master/color/color_screen.png "screenshot")
 
 DESCRIPTION
 
