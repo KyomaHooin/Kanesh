@@ -26,9 +26,8 @@ FILE
    web/color.png  - Logo by Colour Developers (c) 2013-2016
    web/color.wsgi - WSGI frontend.
 
-      diagrams.py - Modified library function.
- color_screen.png - Lab to sRGB color.
-chroma_screen.png - Lab to uv chromaticity UCS 1976 diagram. 
+      diagrams.py - Modified library.
+ color_screen.png - Web screenshot.
  colour-0.3.8.zip - Colour library by Colour Developers (c) 2013-2016
 </pre>
 
