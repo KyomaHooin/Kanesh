@@ -52,7 +52,6 @@ While 1
 		ElseIf Not FileExists(GUICtrlRead($gui_path)) Then
 			GUICtrlSetData($gui_error, "Chyba: Adresar neexistuje.")
 		Else
-			;_ArrayDisplay($map)
 			if GUICtrlRead($check_pro) = $GUI_CHECKED then
 				$filelist = _FileListToArrayRec(GUICtrlRead($gui_path), '*.rtx', 1, 1, 1, 2) ; recursion, files only, sorted, fullpath..
 				If UBound($filelist) < 2 Then
