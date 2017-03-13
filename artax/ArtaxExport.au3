@@ -6,7 +6,6 @@
 #NoTrayIcon
 
 #include <GUIConstantsEx.au3>
-#include <GUIComboBox.au3>
 #include <ArtaxHelper.au3>
 
 $runtime = @YEAR & @MON & @MDAY & 'T' & @HOUR & @MIN & @SEC

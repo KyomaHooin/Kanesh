@@ -8,8 +8,6 @@
 ;INCLUDE
 #include <_XMLDomWrapper.au3>
 #include <GUIConstantsEx.au3>
-#include <GUIComboBox.au3>
-#include <GUIEdit.au3>
 #include <File.au3>
 
 ;VAR
