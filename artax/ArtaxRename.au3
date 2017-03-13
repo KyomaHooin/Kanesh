@@ -86,6 +86,8 @@ While 1
 							continueloop
 						endif
 					next
+					GUICtrlSetData($gui_progress, 0) ; clear progress
+					GUICtrlSetData($gui_error, "Hotovo!")
 				endif
 			Else
 				$filelist = _FileListToArrayRec(GUICtrlRead($gui_path), 'tab*.*', 1, 1, 1, 2) ; recursion, files only, sorted, fullpath..
@@ -99,10 +101,10 @@ While 1
 						$spectra_new = _Artax_GetSpectra(StringRegExpReplace($filelist[$i], ".*\\(tabl_\d+)@.*$", "$1"), $map)
 						if $spectra_new Then FileMove($filelist[$i], StringRegExpReplace($filelist[$i], "(.*\\)(tabl_\d+@\d+_\d+)(.*)$", "$1" & $spectra_new & "$3"))
 					Next
+					GUICtrlSetData($gui_progress, 0) ; clear progress
+					GUICtrlSetData($gui_error, "Hotovo!")
 				EndIf
 			Endif
-			GUICtrlSetData($gui_progress, 0) ; clear progress
-			GUICtrlSetData($gui_error, "Hotovo!")
 		EndIf
 	EndIf
 	If $event = $GUI_EVENT_CLOSE Or $event = $button_exit Then
