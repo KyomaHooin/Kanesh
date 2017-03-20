@@ -25,7 +25,7 @@ DirCreate(@scriptdir & '\export')
 if UBound(ProcessList(@ScriptName)) > 2 then exit; already running
 
 ;GUI
-$gui = GUICreate("ArtaxExport v 2.0", 351, 91)
+$gui = GUICreate("ArtaxExport v 2.1", 351, 91)
 $label_path = GUICtrlCreateLabel("Projekt:", 6, 10, 35, 21)
 $gui_path = GUICtrlCreateInput($path_history, 46, 8, 217, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
@@ -96,7 +96,7 @@ While 1
 					WinSetState($err,'',@SW_HIDE)
 					WinActivate($err)
 					WinWaitActive($err,'',5)
-					WinClose($err)
+					if not WinWaitClose($err,'',5) then WinKill($err); force close
 					$atx_list = WinList("ARTAX")
 					for $i = 0 to UBound($atx_list) - 1;get ATX child
 						if $atx_list[$i][0] == 'ARTAX' and $atx_list[$i][1] <> $atx then $atx_child = $atx_list[$i][1]
@@ -186,8 +186,8 @@ While 1
 						next
 					EndIf
 				endif
-				WinClose($atx_child)
-				WinClose($atx)
+				if not WinWaitClose($atx_child,'',5) then WinKill($atx_child); force close
+				if not WinWaitClose($atx,'',5) then WinKill($atx); force close
 				GUICtrlSetData($gui_error, "Hotovo.")
 				BlockInput(0); unblock user input
 			endif
