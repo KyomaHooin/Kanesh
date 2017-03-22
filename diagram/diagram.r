@@ -24,7 +24,6 @@ plot_err <- function(e) {
 	done()
 }
 
-
 tryCatch(library(ggtern), error = lib_err)
 
 cat('--\n')
@@ -44,3 +43,4 @@ tryCatch(
 	ggsave(file=filename, width=7, height=7),
 	warning = plot_err, error = plot_err
 )
+
