@@ -35,7 +35,19 @@ tryCatch(
 	warning = csv_err, error = csv_err
 )
 
-p <- ggtern(data, aes(Fe,Si,Ca)) + geom_point()
+p <- ggtern(data, aes(Fe,Si,Ca)) +				# data
+
+	geom_point() +						# bod
+
+	geom_density_tern() +					# density
+
+	theme_showarrows() +					# arrow
+
+#	labs(title = 'Tablet Tenary Diagram') +			# title
+
+#	theme(plot.title = element_text(hjust = 0.5)) +		# center the title
+
+	labs(x = 'Fe [%]', y = 'Si [%]', z = 'Ca [%]')		# label
 
 filename = paste('diagram_',sep='',format(Sys.time(),"%d_%m_%y_%H_%M"),'.png')
 
@@ -43,4 +55,3 @@ tryCatch(
 	ggsave(file=filename, width=7, height=7),
 	warning = plot_err, error = plot_err
 )
-
