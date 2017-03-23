@@ -37,11 +37,19 @@ tryCatch(
 
 p <- ggtern(data, aes(Fe,Si,Ca)) +				# data
 
-	geom_point() +						# bod
+#	geom_density_tern() +					# density
 
-	geom_density_tern() +					# density
+	stat_density_tern(					# density polygon
+		geom='polygon',
+		aes(fill= ..level..),
+		show.legend = FALSE
+	) +
+
+	geom_point() +						# point
 
 	theme_showarrows() +					# arrow
+
+	theme_mesh(10) +					# mesh
 
 #	labs(title = 'Tablet Tenary Diagram') +			# title
 
@@ -52,6 +60,6 @@ p <- ggtern(data, aes(Fe,Si,Ca)) +				# data
 filename = paste('diagram_',sep='',format(Sys.time(),"%d_%m_%y_%H_%M"),'.png')
 
 tryCatch(
-	ggsave(file=filename, width=7, height=7),
+	ggsave(file=filename, width = 5, height = 5),
 	warning = plot_err, error = plot_err
 )
