@@ -35,7 +35,7 @@ tryCatch(
 	warning = csv_err, error = csv_err
 )
 
-p <- ggtern(data, aes(Fe,Si,Ca)) +				# data
+p <- ggtern(data, aes(Ca,K,Fe)) +				# data
 
 #	geom_density_tern() +					# density
 
@@ -55,7 +55,7 @@ p <- ggtern(data, aes(Fe,Si,Ca)) +				# data
 
 #	theme(plot.title = element_text(hjust = 0.5)) +		# center the title
 
-	labs(x = 'Fe [%]', y = 'Si [%]', z = 'Ca [%]')		# label
+	labs(x = 'Ca [%]', y = 'K [%]', z = 'Fe [%]')		# label
 
 filename = paste('diagram_',sep='',format(Sys.time(),"%d_%m_%y_%H_%M"),'.png')
 
