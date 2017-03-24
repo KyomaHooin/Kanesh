@@ -3,37 +3,29 @@
 # R - Ternary Diagram
 #
 
-done <- function() {
-	cat('\nTermining...\n')
-	Sys.sleep(5)
-	q()
-}
+cat('\nLoading functions..\n')
 
-lib_err <- function(e) {
-	cat('\nMissing "ggtern" library.\n')
-	done()
-}
+done <- function() { Sys.sleep(5); q() }
 
-csv_err <- function(e) {
-	cat('\nInvalid CSV format.\n')
-	done()
-}
+ok <- function() { cat('\nOk.\n'); done() }
 
-plot_err <- function(e) {
-	cat('\nPlot error.\n')
-	done()
-}
+lib_err <- function(e) { cat('\nMissing ggtern library.\n'); done() }
 
-tryCatch(library(ggtern), error = lib_err)
+open_err <- function(e) { cat('\nCancelled. \n'); done() }
 
-cat('--\n')
+csv_err <- function(e) { cat('\nInvalid CSV format.\n'); done() }
 
-csv <- file.choose()
+plot_err <- function(e) { cat('\nPlot error.\n'); done() }
 
-tryCatch(
-	data <- read.csv(csv, header = TRUE, sep = ";"),
-	warning = csv_err, error = csv_err
-)
+cat('\nLoading ggtern library..\n')
+
+suppressMessages(tryCatch(library(ggtern), error = lib_err))
+
+cat('\nLoading CSV file..\n')
+
+tryCatch(csv <- file.choose(), error = open_err)
+
+tryCatch( data <- read.csv(csv, header = TRUE, sep = ";"), error = csv_err)
 
 p <- ggtern(data, aes(Ca,K,Fe)) +				# data
 
@@ -57,9 +49,9 @@ p <- ggtern(data, aes(Ca,K,Fe)) +				# data
 
 	labs(x = 'Ca [%]', y = 'K [%]', z = 'Fe [%]')		# label
 
-filename = paste('diagram_',sep='',format(Sys.time(),"%d_%m_%y_%H_%M"),'.png')
+fn = paste('diagram_',sep='',format(Sys.time(),"%d_%m_%y_%H_%M"),'.png')
 
-tryCatch(
-	ggsave(file=filename, width = 5, height = 5),
-	warning = plot_err, error = plot_err
-)
+tryCatch(ggsave(file = fn, p, width = 5, height = 5), warning = plot_err, error = plot_err)
+
+ok()
+
