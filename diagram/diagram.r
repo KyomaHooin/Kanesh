@@ -32,8 +32,8 @@ p <- ggtern(data, aes(Ca,K,Fe)) +				# data
 #	geom_density_tern() +					# density
 
 	stat_density_tern(					# density polygon
-		geom='polygon',
-		aes(fill= ..level..),
+		geom = 'polygon',
+		aes(fill = ..level..),
 		show.legend = FALSE
 	) +
 
@@ -49,7 +49,7 @@ p <- ggtern(data, aes(Ca,K,Fe)) +				# data
 
 	labs(x = 'Ca [%]', y = 'K [%]', z = 'Fe [%]')		# label
 
-fn = paste('diagram_',sep='',format(Sys.time(),"%d_%m_%y_%H_%M"),'.png')
+fn = paste('diagram_', sep = '', format(Sys.time(),"%d_%m_%y_%H_%M"), '.png')
 
 tryCatch(ggsave(file = fn, p, width = 5, height = 5), warning = plot_err, error = plot_err)
 
