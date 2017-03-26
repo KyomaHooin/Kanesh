@@ -25,7 +25,7 @@ cat('\nLoading CSV file..\n')
 
 tryCatch(csv <- file.choose(), error = open_err)
 
-tryCatch( data <- read.csv(csv, header = TRUE, sep = ";"), error = csv_err)
+tryCatch(data <- read.csv(csv, header = TRUE, sep = ";"), error = csv_err)
 
 p <- ggtern(data, aes(Ca,K,Fe)) +				# data
 
@@ -49,7 +49,7 @@ p <- ggtern(data, aes(Ca,K,Fe)) +				# data
 
 	labs(x = 'Ca [%]', y = 'K [%]', z = 'Fe [%]')		# label
 
-fn = paste('diagram_', sep = '', format(Sys.time(),"%d_%m_%y_%H_%M"), '.png')
+fn = paste('diagram_', sep = '', format(Sys.time(), "%d_%m_%y_%H_%M"), '.png')
 
 tryCatch(ggsave(file = fn, p, width = 5, height = 5), warning = plot_err, error = plot_err)
 
