@@ -116,11 +116,12 @@ While 1
 							WinActivate($atx_child)
 							WinWaitActive($atx_child,'',15)
 							Send('!fo')
-							$project_open = WinWaitActive("Open Project",'',5)
-							Sleep(100); hold on a micro
+							$project_open = WinWaitActive("Open Project",'',15)
+							WinActivate($project_open)
+							Sleep(500); hold on a micro
 							Send($project_list[$i])
 							Send('!o')
-							Sleep(100)
+							Sleep(500)
 							$openerr = WinGetHandle('','')
 							if not $project_open or WinGetTitle($openerr,'') == 'Error' Then
 								logger("Open project err: " & $project_list[$i])
@@ -131,10 +132,10 @@ While 1
 							$project = StringRegExpReplace($project_list[$i],".*\\(.*).rtx$","$1")
 							DirCreate(@ScriptDir & '\export\' & $project)
 							Send('{TAB}{DOWN}')
-							$project_info = WinWait('Project Information','',5); get ATX child handle
+							$project_info = WinWait('Project Information','',10); get ATX child handle
 							WinSetState($project_info,'',@SW_HIDE)
 							WinActivate($project_info)
-							WinWaitActive($project_info,'',5)
+							WinWaitActive($project_info,'',10)
 							WinClose($project_info)
 							Send('{DOWN}')
 							;---- spectra ----
