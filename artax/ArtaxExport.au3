@@ -25,7 +25,7 @@ DirCreate(@scriptdir & '\export')
 if UBound(ProcessList(@ScriptName)) > 2 then exit; already running
 
 ;GUI
-$gui = GUICreate("ArtaxExport v 2.1", 351, 91)
+$gui = GUICreate("ArtaxExport v 2.2", 351, 91)
 $label_path = GUICtrlCreateLabel("Projekt:", 6, 10, 35, 21)
 $gui_path = GUICtrlCreateInput($path_history, 46, 8, 217, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
@@ -132,10 +132,12 @@ While 1
 							$project = StringRegExpReplace($project_list[$i],".*\\(.*).rtx$","$1")
 							DirCreate(@ScriptDir & '\export\' & $project)
 							Send('{TAB}{DOWN}')
-							$project_info = WinWait('Project Information','',10); get ATX child handle
+							$project_info = WinWaitActive('Project Information','',10)
+							if not $project_info Then
+								logger("Project info err.")
+								ContinueLoop
+							Endif
 							WinSetState($project_info,'',@SW_HIDE)
-							WinActivate($project_info)
-							WinWaitActive($project_info,'',10)
 							WinClose($project_info)
 							Send('{DOWN}')
 							;---- spectra ----
