@@ -503,7 +503,7 @@ def CIE_1976_UCS_chromaticity_diagram_colours_plot(
 
 
 def CIE_1976_UCS_chromaticity_diagram_plot(
-        Lab,
+        Lab_array,
         cmfs='CIE 1931 2 Degree Standard Observer',
         show_diagram_colours=True,
         **kwargs):
@@ -562,9 +562,9 @@ def CIE_1976_UCS_chromaticity_diagram_plot(
                linewidth=2)
 
     # plot Lab color
-    Lab_uv = Luv_to_uv(XYZ_to_Luv(Lab_to_XYZ(Lab,illuminant),illuminant),illuminant)
-   
-    pylab.plot(Lab_uv[0],Lab_uv[1],'o',color='black',markeredgewidth=1,markeredgecolor='black',markerfacecolor='none')
+    for Lab in Lab_array: 
+        Lab_uv = Luv_to_uv(XYZ_to_Luv(Lab_to_XYZ(Lab,illuminant),illuminant),illuminant)
+       	pylab.plot(Lab_uv[0],Lab_uv[1],'o',color='black',markeredgewidth=1,markeredgecolor='black',markerfacecolor='none')
 
     for label in labels:
         u, v = wavelengths_chromaticity_coordinates.get(label)

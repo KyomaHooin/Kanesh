@@ -34,25 +34,16 @@ illuminant = DEFAULT_PLOTTING_ILLUMINANT# D65
 
 def plot_data(data,out):
 	try:
+		Lab_array = []
+		img1_buff = StringIO.StringIO()
+
 		for line in data.splitlines():
-			img1_buff = StringIO.StringIO()
 			img2_buff = StringIO.StringIO()
-		
 			ln = line.split(';')
 
 			Lab = numpy.array([float(ln[1]),float(ln[2]),float(ln[3])])
-
+			Lab_array.append(Lab)
 			Lab_sRGB = XYZ_to_sRGB(Lab_to_XYZ(Lab,illuminant),illuminant)
-
-			CIE_1976_UCS_chromaticity_diagram_plot(
-				Lab, \
-				filename=img1_buff, \
-				figure_size=(6,6), \
-				title='CIE 1976 Chromaticity Diagram - ' + ln[0]
-			)
-
-			out.writestr(ln[0] + '_1976.png',img1_buff.getvalue())
-			img1_buff.close()
 
 			single_colour_plot(
 				ColourParameter(RGB=Lab_sRGB), \
@@ -60,9 +51,19 @@ def plot_data(data,out):
 				figure_size=(4,4), \
 				title='Lab to sRGB color - ' + ln[0]
 			)
-		
+
 			out.writestr(ln[0] + '_sRGB.png',img2_buff.getvalue())
 			img2_buff.close()
+	
+		CIE_1976_UCS_chromaticity_diagram_plot(
+			Lab_array, \
+			filename=img1_buff, \
+			figure_size=(6,6), \
+			title='CIE 1976 Chromaticity Diagram'
+		)
+
+		out.writestr('CIE_1976.png',img1_buff.getvalue())
+		img1_buff.close()
 	except:
 		return '<font style="padding-left: 42px;" color="red">Chyba při generování grafu.</font>'
 
