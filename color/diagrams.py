@@ -564,7 +564,7 @@ def CIE_1976_UCS_chromaticity_diagram_plot(
     # plot Lab color
     for Lab in Lab_array: 
         Lab_uv = Luv_to_uv(XYZ_to_Luv(Lab_to_XYZ(Lab,illuminant),illuminant),illuminant)
-       	pylab.plot(Lab_uv[0],Lab_uv[1],'o',color='black',markeredgewidth=1,markeredgecolor='black',markerfacecolor='none')
+       	pylab.plot(Lab_uv[0],Lab_uv[1],'+',color='black',markeredgewidth=1,markeredgecolor='black',markerfacecolor='none')
 
     for label in labels:
         u, v = wavelengths_chromaticity_coordinates.get(label)
@@ -614,7 +614,7 @@ def CIE_1976_UCS_chromaticity_diagram_plot(
         'x_label': 'CIE u\'',
         'y_label': 'CIE v\'',
         'grid': True,
-        'bounding_box': (0, 1, 0, 1)})
+        'bounding_box': (0.1, 0.4, 0.4, 0.7)})
     settings.update(kwargs)
 
     boundaries(**settings)
