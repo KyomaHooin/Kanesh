@@ -15,7 +15,7 @@ html_head = """
 <head><meta charset="utf-8"></head>
 <body>
 <img width="500" src="/media/color.png">
-<br><p style="padding-left: 42px;">[ Formát CSV: <b>ID;L;a;b</b> ]</p>
+<br><p style="padding-left: 42px;">[ Formát CSV: <b>ID;STD;L;a;b</b> ]</p>
 <form style="padding-left: 42px;" enctype="multipart/form-data" action="color" method="post">
 <b>Soubor CSV</b>: <input style="background-color:#ddd;" type="file" name="file"> <input type="submit" value="Export">
 </form>
@@ -41,7 +41,7 @@ def plot_data(data,out):
 			img2_buff = StringIO.StringIO()
 			ln = line.split(';')
 
-			Lab = numpy.array([float(ln[1]),float(ln[2]),float(ln[3])])
+			Lab = numpy.array([float(ln[2]),float(ln[3]),float(ln[4])])
 			Lab_array.append(Lab)
 			Lab_sRGB = XYZ_to_sRGB(Lab_to_XYZ(Lab,illuminant),illuminant)
 
@@ -49,7 +49,8 @@ def plot_data(data,out):
 				ColourParameter(RGB=Lab_sRGB), \
 				filename=img2_buff, \
 				figure_size=(4,4), \
-				title='Lab to sRGB color - ' + ln[0]
+				title='Lab to sRGB color - ' + ln[0], \
+				x_label= ln[1]
 			)
 
 			out.writestr(ln[0] + '_sRGB.png',img2_buff.getvalue())
@@ -69,7 +70,7 @@ def plot_data(data,out):
 
 def is_csv(data):
 	for line in data.splitlines():
-		if len(line.split(';')) != 4: return 0
+		if len(line.split(';')) != 5: return 0
 	return 1
 
 def application(environ, start_response):
