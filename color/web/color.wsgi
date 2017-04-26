@@ -46,24 +46,28 @@ def plot_data(data,out):
 			Lab_sRGB = XYZ_to_sRGB(Lab_to_XYZ(Lab,illuminant),illuminant)
 
 			single_colour_plot(
-				ColourParameter(RGB=Lab_sRGB), \
-				filename=img2_buff, \
-				figure_size=(4,4), \
-				title='Lab to sRGB color - ' + ln[0], \
-				x_label= ln[1]
+				ColourParameter(RGB=Lab_sRGB),
+				filename=img2_buff,
+				figure_size=(4,4),
+				title='Lab to sRGB color - ' + ln[0],
+				x_label= ln[1],
+				format='eps',
+				dpi=300
 			)
 
-			out.writestr(ln[0] + '_sRGB.png',img2_buff.getvalue())
+			out.writestr(ln[0] + '_sRGB.eps',img2_buff.getvalue())
 			img2_buff.close()
 	
 		CIE_1976_UCS_chromaticity_diagram_plot(
-			Lab_array, \
-			filename=img1_buff, \
-			figure_size=(6,6), \
-			title='CIE 1976 Chromaticity Diagram'
+			Lab_array,
+			filename=img1_buff,
+			figure_size=(6,6),
+			title='CIE 1976 Chromaticity Diagram',
+			format='eps',
+			dpi=300
 		)
 
-		out.writestr('CIE_1976.png',img1_buff.getvalue())
+		out.writestr('CIE_1976.eps',img1_buff.getvalue())
 		img1_buff.close()
 	except:
 		return '<font style="padding-left: 42px;" color="red">Chyba při generování grafu.</font>'
