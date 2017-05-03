@@ -19,7 +19,7 @@ $mapping = @ScriptDir & '\spectra.txt'
 If UBound(ProcessList(@ScriptName)) > 2 Then Exit
 
 ;GUI
-$gui = GUICreate("ArtaxCalc v 1.2", 351, 91)
+$gui = GUICreate("ArtaxCalc v 1.3", 351, 91)
 $gui_path = GUICtrlCreateInput("", 6, 8, 255, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
 $gui_progress = GUICtrlCreateProgress(6, 38, 338, 16)
@@ -107,15 +107,15 @@ func calc($out,$data)
 	local $begin = 0, $end, $line[11]
 	for $i = 0 to UBound($data) - 1
 		if $i + 1 <= UBound($data) - 1 then; overflow
-			$end+=1
-			if $data[$i][0] <> $data[$i+1][0] then; last
+			if $data[$i][0] <> $data[$i+1][0] or $i + 1 = UBound($data) - 1 then; last or last total
 				;mean
 				$line[0]=$data[$begin][0] & "(avg.)"
 				for $j = 1 to 10
+					if $end + 1 = UBound($data) - 1 then $end+=1; last value
 					for $k = $begin to $end
 						$line[$j]+=$data[$k][$j]
 					next
-					$line[$j] = round($line[$j]/($end - $begin),4)
+					$line[$j] = round($line[$j]/($end - $begin + 1),4); 0-array => +1
 				next
 				FileWriteLine($out,_ArrayToString($line,";"))
 				$mean = $line; copy mean..
@@ -125,19 +125,19 @@ func calc($out,$data)
 				;deviation
 				$line[0]=$data[$begin][0] & "(sd.)"
 				for $j = 1 to 10
+					if $end + 1 = UBound($data) - 1 then $end+=1; last value
 					for $k = $begin to $end
 						$line[$j]+=($data[$k][$j]-$mean[$j])^2
 					next
-					$line[$j] = round(sqrt($line[$j]/($end - $begin)),4)
+					$line[$j] = round(sqrt($line[$j]/($end - $begin + 1)),4); 0-array => +1
 				next
 				FileWriteLine($out,_ArrayToString($line,";"))
 				for $j = 1 to 10; zero-ize array
 					$line[$j] = 0
 				next
-				;update index
-				$begin = $end
-
+				$begin = $end + 1; update start index
 			Endif
+			$end+=1; update end index
 		EndIf
 	next
 EndFunc
