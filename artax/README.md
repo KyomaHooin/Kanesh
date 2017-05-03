@@ -10,6 +10,7 @@ FILE
    ArtaxExport.au3 - Main program.
    ArtaxHelper.au3 - Helper functions.
    ArtaxRename.au3 - Repair export name by map.
+     ArtaxCalc.au3 - Calculate mean/standard deviation from CSV data.
        spectra.txt - Tablet to spectra map.
 _XMLDomWrapper.au3 - XML library by Stephen Podhajecki.
          artax.ico - Program icon. 
