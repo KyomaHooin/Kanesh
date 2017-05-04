@@ -19,7 +19,7 @@ $mapping = @ScriptDir & '\spectra.txt'
 If UBound(ProcessList(@ScriptName)) > 2 Then Exit
 
 ;GUI
-$gui = GUICreate("ArtaxCalc v 1.3", 351, 91)
+$gui = GUICreate("ArtaxCalc v 1.4", 351, 91)
 $gui_path = GUICtrlCreateInput("", 6, 8, 255, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
 $gui_progress = GUICtrlCreateProgress(6, 38, 338, 16)
@@ -73,7 +73,7 @@ While 1
 						if UBound($raw) = 12 then; check CSV compat
 							$fill[0][0] = $sid;
 							for $j = 2 to UBound($raw) - 1; skip 2, move 0,1,10 col.. [number,element,conc.]
-								$fill[0][$j-1] = ($raw[$j])[9]
+								$fill[0][$j-1] = StringRegExpReplace(($raw[$j])[9],',','.')
 							next
 						EndIf
 						_ArrayAdd($data, $fill); populate
@@ -109,7 +109,7 @@ func calc($out,$data)
 		if $i + 1 <= UBound($data) - 1 then; overflow
 			if $data[$i][0] <> $data[$i+1][0] or $i + 1 = UBound($data) - 1 then; last or last total
 				;mean
-				$line[0]=$data[$begin][0] & "(avg.)"
+				$line[0]=$data[$begin][0] & "(avg)"
 				for $j = 1 to 10
 					if $end + 1 = UBound($data) - 1 then $end+=1; last value
 					for $k = $begin to $end
@@ -123,7 +123,7 @@ func calc($out,$data)
 					$line[$j] = 0
 				next
 				;deviation
-				$line[0]=$data[$begin][0] & "(sd.)"
+				$line[0]=$data[$begin][0] & "(sd)"
 				for $j = 1 to 10
 					if $end + 1 = UBound($data) - 1 then $end+=1; last value
 					for $k = $begin to $end
