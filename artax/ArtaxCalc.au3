@@ -108,10 +108,10 @@ func calc($out,$data)
 	for $i = 0 to UBound($data) - 1
 		if $i + 1 <= UBound($data) - 1 then; overflow
 			if $data[$i][0] <> $data[$i+1][0] or $i + 1 = UBound($data) - 1 then; last or last total
+				if $end + 1 = UBound($data) - 1 then $end+=1; last value
 				;mean
 				$line[0]=$data[$begin][0] & "(avg)"
 				for $j = 1 to 10
-					if $end + 1 = UBound($data) - 1 then $end+=1; last value
 					for $k = $begin to $end
 						$line[$j]+=$data[$k][$j]
 					next
@@ -125,7 +125,6 @@ func calc($out,$data)
 				;deviation
 				$line[0]=$data[$begin][0] & "(sd)"
 				for $j = 1 to 10
-					if $end + 1 = UBound($data) - 1 then $end+=1; last value
 					for $k = $begin to $end
 						$line[$j]+=($data[$k][$j]-$mean[$j])^2
 					next
