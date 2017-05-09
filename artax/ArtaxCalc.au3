@@ -106,7 +106,6 @@ EndFunc
 
 func calc($out,$data)
 	local $begin = 0, $end, $line[22]; ID,Num. + 20
-;	_ArrayDisplay($data)
 	for $i = 0 to UBound($data) - 1
 		if $i + 1 <= UBound($data) - 1 then; overflow
 			if $data[$i][0] <> $data[$i+1][0] or $i + 1 = UBound($data) - 1 then; last or last total
