@@ -7,6 +7,8 @@ Bruker Artax 400 uXRF spectrometer data export wrapper.
 FILE
 
 <pre>
+  Artax_manual.odt - Program input/output manual.
+  Artax_manual.pdf - Program input/output manual.
    ArtaxExport.au3 - Main program.
    ArtaxHelper.au3 - Helper functions.
    ArtaxRename.au3 - Repair export name by map.
