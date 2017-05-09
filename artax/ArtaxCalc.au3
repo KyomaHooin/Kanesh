@@ -19,7 +19,7 @@ $mapping = @ScriptDir & '\spectra.txt'
 If UBound(ProcessList(@ScriptName)) > 2 Then Exit
 
 ;GUI
-$gui = GUICreate("ArtaxCalc v 1.4", 351, 91)
+$gui = GUICreate("ArtaxCalc v 1.5", 351, 91)
 $gui_path = GUICtrlCreateInput("", 6, 8, 255, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
 $gui_progress = GUICtrlCreateProgress(6, 38, 338, 16)
@@ -84,7 +84,8 @@ While 1
 				_ArraySort($data); array sort
 				$out = FileOpen(@ScriptDir & '\artax_calc_' & $runtime & ".csv", 258); UTF-8 no BOM overwrite
 				if not @error then
-					FileWriteLine($out, 'sep=;' & @CRLF & "ID;Na;Mg;Al;Si;P;K;Ca;Ti;Mn;Fe")
+					FileWriteLine($out, 'sep=;' & @CRLF & "ID;Num.;Na;Na;Mg;Mg;Al;Al;Si;Si;P;P;K;K;Ca;Ca;Ti;Ti;Mn;Mn;Fe;Fe" & @CRLF & _
+					";;(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd)")
 					calc($out,$data); calculate
 				endif
 				FileClose($out)
@@ -104,34 +105,36 @@ func sid_by_id($id,$map)
 EndFunc
 
 func calc($out,$data)
-	local $begin = 0, $end, $line[11]
+	local $begin = 0, $end, $line[22]; ID,Num. + 20
+;	_ArrayDisplay($data)
 	for $i = 0 to UBound($data) - 1
 		if $i + 1 <= UBound($data) - 1 then; overflow
 			if $data[$i][0] <> $data[$i+1][0] or $i + 1 = UBound($data) - 1 then; last or last total
 				if $end + 1 = UBound($data) - 1 then $end+=1; last value
+				$line[0]=$data[$begin][0]; ID
+				$line[1]=$end - $begin + 1; Num.
 				;mean
-				$line[0]=$data[$begin][0] & "(avg)"
 				for $j = 1 to 10
 					for $k = $begin to $end
-						$line[$j]+=$data[$k][$j]
+						$line[$j*2]+=$data[$k][$j]
 					next
-					$line[$j] = round($line[$j]/($end - $begin + 1),4); 0-array => +1
-				next
-				FileWriteLine($out,_ArrayToString($line,";"))
-				$mean = $line; copy mean..
-				for $j = 1 to 10; zero-ize array
-					$line[$j] = 0
+					$line[$j*2] = $line[$j*2]/($end - $begin + 1); odd
 				next
 				;deviation
-				$line[0]=$data[$begin][0] & "(sd)"
 				for $j = 1 to 10
 					for $k = $begin to $end
-						$line[$j]+=($data[$k][$j]-$mean[$j])^2
+						$line[$j*2+1]+=($data[$k][$j]-$line[$j*2])^2
 					next
-					$line[$j] = round(sqrt($line[$j]/($end - $begin + 1)),4); 0-array => +1
+					$line[$j*2+1] = sqrt($line[$j*2+1]/($end - $begin + 1)); even
 				next
-				FileWriteLine($out,_ArrayToString($line,";"))
+				;round/format output
 				for $j = 1 to 10; zero-ize array
+					$line[$j*2] = StringFormat("%.02f",round($line[$j*2],2))
+					$line[$j*2+1] = StringFormat("%.03f",round($line[$j*2+1],3))
+				next
+				;write & reinit
+				FileWriteLine($out,_ArrayToString($line,";"))
+				for $j = 2 to 21; zero-ize array
 					$line[$j] = 0
 				next
 				$begin = $end + 1; update start index
