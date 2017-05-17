@@ -19,7 +19,7 @@ $mapping = @ScriptDir & '\spectra.txt'
 If UBound(ProcessList(@ScriptName)) > 2 Then Exit
 
 ;GUI
-$gui = GUICreate("ArtaxCalc v 1.5", 351, 91)
+$gui = GUICreate("ArtaxCalc v 1.6", 351, 91)
 $gui_path = GUICtrlCreateInput("", 6, 8, 255, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
 $gui_progress = GUICtrlCreateProgress(6, 38, 338, 16)
@@ -128,8 +128,8 @@ func calc($out,$data)
 				next
 				;round/format output
 				for $j = 1 to 10; zero-ize array
-					$line[$j*2] = StringFormat("%.02f",round($line[$j*2],2))
-					$line[$j*2+1] = StringFormat("%.03f",round($line[$j*2+1],3))
+					$line[$j*2] = StringRegExpReplace(StringFormat("%.02f",round($line[$j*2],2)),"\.",",")
+					$line[$j*2+1] = StringRegExpReplace(StringFormat("%.03f",round($line[$j*2+1],3)),"\.",",")
 				next
 				;write & reinit
 				FileWriteLine($out,_ArrayToString($line,";"))
