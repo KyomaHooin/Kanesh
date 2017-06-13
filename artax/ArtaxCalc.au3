@@ -19,7 +19,7 @@ $mapping = @ScriptDir & '\spectra.txt'
 If UBound(ProcessList(@ScriptName)) > 2 Then Exit
 
 ;GUI
-$gui = GUICreate("ArtaxCalc v 1.6", 351, 91)
+$gui = GUICreate("ArtaxCalc v 1.7", 351, 91)
 $gui_path = GUICtrlCreateInput("", 6, 8, 255, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
 $gui_progress = GUICtrlCreateProgress(6, 38, 338, 16)
@@ -84,7 +84,7 @@ While 1
 				_ArraySort($data); array sort
 				$out = FileOpen(@ScriptDir & '\artax_calc_' & $runtime & ".csv", 258); UTF-8 no BOM overwrite
 				if not @error then
-					FileWriteLine($out, 'sep=;' & @CRLF & "ID;Num.;Na;Na;Mg;Mg;Al;Al;Si;Si;P;P;K;K;Ca;Ca;Ti;Ti;Mn;Mn;Fe;Fe" & @CRLF & _
+					FileWriteLine($out, 'sep=;' & @CRLF & "ID;Num(Excl);Na;Na;Mg;Mg;Al;Al;Si;Si;P;P;K;K;Ca;Ca;Ti;Ti;Mn;Mn;Fe;Fe" & @CRLF & _
 					";;(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd);(avg);(sd)")
 					calc($out,$data); calculate
 				endif
@@ -105,37 +105,49 @@ func sid_by_id($id,$map)
 EndFunc
 
 func calc($out,$data)
-	local $begin = 0, $end, $line[22]; ID,Num. + 20
+	local $begin = 0, $end
 	for $i = 0 to UBound($data) - 1
 		if $i + 1 <= UBound($data) - 1 then; overflow
 			if $data[$i][0] <> $data[$i+1][0] or $i + 1 = UBound($data) - 1 then; last or last total
+				local $line[22]; reinit line
 				if $end + 1 = UBound($data) - 1 then $end+=1; last value
 				$line[0]=$data[$begin][0]; ID
-				$line[1]=$end - $begin + 1; Num.
+				$line[1]=$end - $begin + 1 & '(' & $end - $begin - 1 & ')'; Num(Excl)
 				;mean
 				for $j = 1 to 10
+					local $excl[0]; reinit exc.
 					for $k = $begin to $end
-						$line[$j*2]+=$data[$k][$j]
+						_ArrayAdd($excl,number($data[$k][$j]))
 					next
-					$line[$j*2] = $line[$j*2]/($end - $begin + 1); odd
+					_ArraySort($excl)
+					_ArrayDelete($excl,0)
+					_ArrayDelete($excl,UBound($excl) - 1)
+					for $m = 0 to UBound($excl) - 1
+						$line[$j*2]+=$excl[$m]
+					next
+					$line[$j*2] = $line[$j*2]/($end - $begin - 1); odd
 				next
 				;deviation
 				for $j = 1 to 10
+					local $excl[0]; reinit excl.
 					for $k = $begin to $end
-						$line[$j*2+1]+=($data[$k][$j]-$line[$j*2])^2
+						_ArrayAdd($excl,number($data[$k][$j]))
 					next
-					$line[$j*2+1] = sqrt($line[$j*2+1]/($end - $begin + 1)); even
+					_ArraySort($excl)
+					_ArrayDelete($excl,0)
+					_ArrayDelete($excl,UBound($excl) - 1)
+					for $m = 0 to UBound($excl) -1
+						$line[$j*2+1]+=($excl[$m]-$line[$j*2])^2
+					next
+					$line[$j*2+1] = sqrt($line[$j*2+1]/($end - $begin - 1)); even
 				next
 				;round/format output
-				for $j = 1 to 10; zero-ize array
+				for $j = 1 to 10
 					$line[$j*2] = StringRegExpReplace(StringFormat("%.02f",round($line[$j*2],2)),"\.",",")
 					$line[$j*2+1] = StringRegExpReplace(StringFormat("%.03f",round($line[$j*2+1],3)),"\.",",")
 				next
 				;write & reinit
 				FileWriteLine($out,_ArrayToString($line,";"))
-				for $j = 2 to 21; zero-ize array
-					$line[$j] = 0
-				next
 				$begin = $end + 1; update start index
 			Endif
 			$end+=1; update end index
