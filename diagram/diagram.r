@@ -40,21 +40,15 @@ clr <- hash()
 )
 
 p <- ggtern(data, aes(Mg,Al,Fe)) +				# data
-
 #	stat_density_tern(					# density polygon
 #		geom = 'polygon',
 #		aes(fill = ..level..),
 #		show.legend = FALSE
 #	) +
-
 	theme_showarrows() +					# arrow
-
 	theme_mesh(10) +					# mesh
-
 #	labs(title = 'Tablet Tenary Diagram') +			# title
-
 #	theme(plot.title = element_text(hjust = 0.5)) +		# center the title
-
 	labs(x = 'Mg [%]', y = 'Al [%]', z = 'Fe [%]')		# label
 
 #----------
