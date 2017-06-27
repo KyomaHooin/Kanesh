@@ -7,6 +7,7 @@ Write ternary diagram plot from CSV data.
 INSTALL
 
 install.packages('ggtern')
+install.packages('hash')
 
 FILE
 
