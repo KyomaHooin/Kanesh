@@ -5,12 +5,11 @@ DESCRIPTION
 Write ternary diagram plot from CSV data.
 
 INSTALL
-
+<pre>
 install.packages('ggtern')
 install.packages('hash')
-
+</pre>
 FILE
-
 <pre>
          diagram.r - Main program.
 diagram_screen.png - Output sreen.
