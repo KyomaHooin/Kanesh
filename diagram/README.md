@@ -11,8 +11,10 @@ install.packages('hash')
 </pre>
 FILE
 <pre>
-         diagram.r - Main program.
+         diagram.r - Main R program.
+        diagram.py - Main Python program.
 diagram_screen.png - Output sreen.
+python-ternary.zip - Ternary diagram library by Marc Harper (c) 2015 MIT
 </pre>
 
 CONTACT
