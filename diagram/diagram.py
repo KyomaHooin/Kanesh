@@ -29,7 +29,7 @@ def parse_csv(fn):
 def scatter_data(dat,std):
 	for s in std:
 		tax.scatter(dat[dat[:,3] == s,:3].astype(float), marker='o', color=clr[list(std).index(s)], label=s)
-	tax.legend()
+	tax.legend(frameon=False)
 	
 #---------------------------
 
@@ -50,7 +50,7 @@ std = numpy.unique(data[1:,3])# unique 4th column from 2nd row
 figure, ax = pyplot.subplots(figsize=(10,10))
 tax = ternary.TernaryAxesSubplot(ax=ax,scale=100)
 
-tax.boundary(linewidth=2)
+#tax.boundary(linewidth=2)
 
 tax.gridlines(color="black", multiple=10)
 tax.gridlines(color="blue", multiple=5)
@@ -70,10 +70,8 @@ scatter_data(data,std)
 #SAVE/DISPLAY
 
 ternary.plt.tight_layout()
-#ternary.plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
-
-#ternary.plt.show()
-tax.savefig(filename='demo.png', format='png',dpi=300)
+tax.show()
+#tax.savefig(filename='demo.png', format='png',dpi=300)
 
 #CLEANUP
 
