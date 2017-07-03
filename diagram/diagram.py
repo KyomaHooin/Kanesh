@@ -28,8 +28,16 @@ def parse_csv(fn):
 
 def scatter_data(dat,std):
 	for s in std:
-		tax.scatter(dat[dat[:,3] == s,:3].astype(float), marker='o', color=clr[list(std).index(s)], label=s)
-	tax.legend(frameon=False)
+		tax.scatter(
+			dat[dat[:,3] == s,:3].astype(float),
+			marker='o',
+			edgecolor='black',
+			linewidth='1',
+			s=50,
+			color=clr[list(std).index(s)],
+			label=s
+		)
+	tax.legend(frameon=False, scatterpoints=1, handletextpad=0)
 	
 #---------------------------
 
@@ -52,8 +60,7 @@ tax = ternary.TernaryAxesSubplot(ax=ax,scale=100)
 
 #tax.boundary(linewidth=2)
 
-tax.gridlines(color="black", multiple=10)
-tax.gridlines(color="blue", multiple=5)
+tax.gridlines(color="blue", multiple=5,zorder=-1)
 
 tax.left_axis_label("<- " + element[2] + " [%]", fontsize=20, offset=0.1)
 tax.right_axis_label("<- " + element[1] + " [%]", fontsize=20, offset=0.1)
@@ -70,6 +77,7 @@ scatter_data(data,std)
 #SAVE/DISPLAY
 
 ternary.plt.tight_layout()
+
 tax.show()
 #tax.savefig(filename='demo.png', format='png',dpi=300)
 
