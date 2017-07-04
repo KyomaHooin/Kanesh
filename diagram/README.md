@@ -13,7 +13,7 @@ install.packages('hash')
 
 PYTHON
 
-ternary, matplotlib, scipy, numpy
+apt-get install python-numpy python-scipy python-matplotlib libapache2-mod-wsgi
 </pre>
 INPUT
 <pre>
