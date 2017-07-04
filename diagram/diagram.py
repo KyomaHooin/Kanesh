@@ -37,7 +37,6 @@ def scatter_data(dat,std):
 			color=clr[list(std).index(s)],
 			label=s
 		)
-	tax.legend(frameon=False, scatterpoints=1, handletextpad=0)
 	
 #---------------------------
 
@@ -55,28 +54,66 @@ std = numpy.unique(data[1:,3])# unique 4th column from 2nd row
 
 #BASE
 
-figure, ax = pyplot.subplots(figsize=(10,10))
+figure, ax = pyplot.subplots(figsize=(8,8), facecolor='white')
 tax = ternary.TernaryAxesSubplot(ax=ax,scale=100)
 
-#tax.boundary(linewidth=2)
+#GRID
 
 tax.gridlines(color="blue", multiple=5,zorder=-1)
+#tax.boundary(linewidth=2)
 
-tax.left_axis_label("<- " + element[2] + " [%]", fontsize=20, offset=0.1)
-tax.right_axis_label("<- " + element[1] + " [%]", fontsize=20, offset=0.1)
-tax.bottom_axis_label("-> " + element[0] + " [%]", fontsize=20, offset=0.03)
-tax._redraw_labels()
+#TICK
 
 tax.ticks(linewidth=2, multiple=10)
-tax.clear_matplotlib_ticks()
+#tax.clear_matplotlib_ticks()
+
+#AXIS
+
+ax.axis('off')
+
+#ARROW
+
+#ax = tax.get_axes()
+#transform = ax.transAxes
+#x, y = ternary.project_point((-0.04,0.04, -0.04/2))
+#x, y = ternary.project_point((1, 0.04, 0))
+#x, y = ternary.project_point((-0.16/2, 1 + 0.16, 0))
+
+ternary.plt.annotate(
+	"",
+	xy=ternary.project_point((10,20,70)),
+	xytext=ternary.project_point((70,10,20)),
+	arrowprops=dict(arrowstyle="-|>")
+)
+
+#LABEL
+
+tax.right_corner_label(element[1] + '[%]', fontsize=20, offset=0.04)
+tax.left_corner_label(element[2] + '[%]', fontsize=20, offset=0.04)
+tax.top_corner_label(element[0] + '[%]', fontsize=20, offset=0.2)
+#tax.left_axis_label(element[2] + " [%]", fontsize=20, offset=0.1)
+#tax.right_axis_label(element[1] + " [%]", fontsize=20, offset=0.1)
+#tax.bottom_axis_label(element[0] + " [%]", fontsize=20, offset=0.03)
+
+tax._redraw_labels()
+
+#TICK
+
+#tax.ticks(linewidth=2, multiple=10)
+#tax.clear_matplotlib_ticks()
 
 #SCATTER
 
 scatter_data(data,std)
 
+#LEGEND
+
+tax.legend(frameon=False, scatterpoints=1, handletextpad=0, bbox_to_anchor = (1.08, 1.15))
+
 #SAVE/DISPLAY
 
-ternary.plt.tight_layout()
+ternary.plt.subplots_adjust(left=0.08,right=0.9,top=0.85, bottom=0.06)
+#ternary.plt.tight_layout()
 
 tax.show()
 #tax.savefig(filename='demo.png', format='png',dpi=300)
