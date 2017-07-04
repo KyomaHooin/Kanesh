@@ -60,12 +60,10 @@ tax = ternary.TernaryAxesSubplot(ax=ax,scale=100)
 #GRID
 
 tax.gridlines(color="blue", multiple=5,zorder=-1)
-#tax.boundary(linewidth=2)
 
 #TICK
 
 tax.ticks(linewidth=2, multiple=10)
-#tax.clear_matplotlib_ticks()
 
 #AXIS
 
@@ -73,10 +71,9 @@ ax.axis('off')
 
 #ARROW
 
-ax = tax.get_axes()
-ax.annotate("", xy=(10,30), xytext=(30,65), arrowprops=dict(arrowstyle="->"))
+ax.annotate("", xy=(7.5,25), xytext=(25,55), arrowprops=dict(arrowstyle="->"))
 ax.annotate("", xy=(30,-6), xytext=(70,-6), arrowprops=dict(arrowstyle="<-"))
-ax.annotate("", xy=(90,30), xytext=(70,65), arrowprops=dict(arrowstyle="<-"))
+ax.annotate("", xy=(92.5,25), xytext=(75,55), arrowprops=dict(arrowstyle="<-"))
 
 #LABEL
 
@@ -101,10 +98,9 @@ tax.legend(frameon=False, scatterpoints=1, handletextpad=0, bbox_to_anchor = (1.
 #SAVE/DISPLAY
 
 ternary.plt.subplots_adjust(left=0.08,right=0.9,top=0.85, bottom=0.06)
-#ternary.plt.tight_layout()
 
-tax.show()
-#tax.savefig(filename='demo.png', format='png',dpi=300)
+#tax.show()
+tax.savefig(filename='demo.png', format='png',dpi=300)
 
 #CLEANUP
 
