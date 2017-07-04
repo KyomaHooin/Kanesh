@@ -73,34 +73,22 @@ ax.axis('off')
 
 #ARROW
 
-#ax = tax.get_axes()
-#transform = ax.transAxes
-#x, y = ternary.project_point((-0.04,0.04, -0.04/2))
-#x, y = ternary.project_point((1, 0.04, 0))
-#x, y = ternary.project_point((-0.16/2, 1 + 0.16, 0))
-
-ternary.plt.annotate(
-	"",
-	xy=ternary.project_point((10,20,70)),
-	xytext=ternary.project_point((70,10,20)),
-	arrowprops=dict(arrowstyle="-|>")
-)
+ax = tax.get_axes()
+ax.annotate("", xy=(10,30), xytext=(30,65), arrowprops=dict(arrowstyle="->"))
+ax.annotate("", xy=(30,-6), xytext=(70,-6), arrowprops=dict(arrowstyle="<-"))
+ax.annotate("", xy=(90,30), xytext=(70,65), arrowprops=dict(arrowstyle="<-"))
 
 #LABEL
 
-tax.right_corner_label(element[1] + '[%]', fontsize=20, offset=0.04)
-tax.left_corner_label(element[2] + '[%]', fontsize=20, offset=0.04)
+tax.right_corner_label(element[1] + '[%]', fontsize=20, offset=0.01)
+tax.left_corner_label(element[2] + '[%]', fontsize=20, offset=0.01)
 tax.top_corner_label(element[0] + '[%]', fontsize=20, offset=0.2)
-#tax.left_axis_label(element[2] + " [%]", fontsize=20, offset=0.1)
-#tax.right_axis_label(element[1] + " [%]", fontsize=20, offset=0.1)
-#tax.bottom_axis_label(element[0] + " [%]", fontsize=20, offset=0.03)
+
+tax.left_axis_label(element[2] + " [%]", fontsize=12, offset=0.12)
+tax.right_axis_label(element[1] + " [%]", fontsize=12, offset=0.12)
+tax.bottom_axis_label(element[0] + " [%]", fontsize=12, offset=0)
 
 tax._redraw_labels()
-
-#TICK
-
-#tax.ticks(linewidth=2, multiple=10)
-#tax.clear_matplotlib_ticks()
 
 #SCATTER
 
