@@ -21,6 +21,13 @@ CONFIG
 WSGIScriptAlias /color /var/www/color/color.wsgi
 WSGIApplicationGroup %{GLOBAL}
 </pre>
+INPUT
+<pre>
+J459;Moss Grey;40.0;4.7;8.0
+J459;Moss Grey;40.2;3.9;7.7
+J462;Grey Biege;59.8;13.1;17.0
+J462;Grey Biege;57.6;11.2;19.1
+</pre>
 FILE
 <pre>
    web/color.png  - Logo by Colour Developers (c) 2013-2016
