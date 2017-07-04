@@ -77,9 +77,9 @@ ax.annotate("", xy=(92.5,25), xytext=(75,55), arrowprops=dict(arrowstyle="<-"))
 
 #LABEL
 
-tax.right_corner_label(element[1] + '[%]', fontsize=20, offset=0.01)
+tax.right_corner_label(element[0] + '[%]', fontsize=20, offset=0.01)
 tax.left_corner_label(element[2] + '[%]', fontsize=20, offset=0.01)
-tax.top_corner_label(element[0] + '[%]', fontsize=20, offset=0.2)
+tax.top_corner_label(element[1] + '[%]', fontsize=20, offset=0.2)
 
 tax.left_axis_label(element[2] + " [%]", fontsize=12, offset=0.12)
 tax.right_axis_label(element[1] + " [%]", fontsize=12, offset=0.12)
