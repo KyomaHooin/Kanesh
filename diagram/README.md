@@ -24,8 +24,11 @@ Mg;Al;Fe;Std
 </pre>
 FILE
 <pre>
-              diagram.r - Main R program.
-             diagram.py - Main Python program.
+  web/python-powerd.png - Python logo by Python.org
+       web/diagram.wsgi - WSGI frontend.
+
+              diagram.r - Original R program.
+             diagram.py - Standalone Python program.
 ternary_axes_subplot.py - Corner label patch by ZGainsforth (c) 2016
      diagram_screen.png - Output sreen.
      python-ternary.zip - Ternary diagram library by Marc Harper (c) 2015 MIT
