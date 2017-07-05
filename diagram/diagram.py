@@ -20,11 +20,13 @@ def is_csv(fn):
 	return 1
 
 def parse_csv(fn):
-	csv=[]
 	fn.seek(0)# not required in file buffer
-	for line in fn.readlines():
-		csv.append(line.strip().split(';'))
-	return numpy.array(csv)
+	return numpy.genfromtxt(
+			fn,
+			delimiter=';',
+			autostrip=True,
+			dtype=None
+		)
 
 def scatter_data(dat,std):
 	for s in std:
