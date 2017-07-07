@@ -18,7 +18,31 @@ html_head = """
 <img src="/media/python-powered.png">
 <br><p style="padding-left: 42px;">[ Formát CSV: <b>Element;Element;Element;STD</b> ]</p>
 <form style="padding-left: 42px;" enctype="multipart/form-data" action="diagram" method="post">
-<b>Soubor CSV</b>: <input style="background-color:#ddd;" type="file" name="file"> <input type="submit" value="Export">
+<b>Soubor CSV</b>: <input style="background-color:#ddd;" type="file" name="file"><br><br>
+<table>
+<tr><td><input type="checkbox" id="natrium" name="natrium" value="natrium"></td>
+<td><label for="natrium">Na</label><td>- Sodík</td></tr>
+<tr><td><input type="checkbox" id="magnesium" name="magnesium" value="magnesium"></td>
+<td><label for="magnesium">Mg</label></td><td>- Hořčík</td></tr>
+<tr><td><input type="checkbox" id="aluminium" name="aluminium" value="aluminium"></td>
+<td><label for="aluminium">Al</label></td><td>- Hliník</td></tr>
+<tr><td><input type="checkbox" id="silicium" name="silicium" value="silicium"></td>
+<td><label for="silicium">Si</label></td><td>- Křemík</td></tr>
+<tr><td><input type="checkbox" id="phosphorus" name="phosphorus" value="phosphorus"></td>
+<td><label for="phosphorus">P</label></td><td>- Fosfor</td></tr>
+<tr><td><input type="checkbox" id="kalium" name="kalium" value="kalium"></td>
+<td><label for="kalium">K</label></td><td>- Draslík</td></tr>
+<tr><td><input type="checkbox" id="calcium" name="calcium" value="calcium"></td>
+<td><label for="calcium">Ca</label></td><td>- Vápník</td></tr>
+<tr><td><input type="checkbox" id="titan" name="titan" value="titan"></td>
+<td><label for="titan">Ti</label></td><td>- Titan</td></tr>
+<tr><td><input type="checkbox" id="manganum" name="manganum" value="manganum"></td>
+<td><label for="manganum">Mn</label></td><td>- Mangan</td></tr>
+<tr><td><input type="checkbox" id="ferrum" name="ferrum" value="ferrum"></td>
+<td><label for="ferrum">Fe</label></td><td>- Železo</td></tr>
+</table>
+<br>
+<input type="submit" value="Export">
 </form>
 """
 
@@ -29,7 +53,8 @@ html_foot = """
 
 status = '200 OK'
 
-clr = ('#DC143C','#EE1289','#0000FF','#00CDCD','#00C957','#9ACD32','#FFD700','#EE7600','#FF0000')
+clr = ('#F3C300','#875692','#F38400','#A1CAF1','#BE0032','#C2B280','#848482','#008856','#E68FAC','#0067A5',
+	'#F99379','#604E97','#F6A600','#B3446C','#DCD300','#882D17','#8DB600','#654522','#E25822','#2B3D26')
 
 #---------------------------
 
@@ -49,11 +74,12 @@ def plot_data(csv,out):
 		std = numpy.unique(data[1:,3])# unique 4th column from 2nd row
 
 		figure, ax = pyplot.subplots(figsize=(8,8), facecolor='white')
-		tax = ternary.TernaryAxesSubplot(ax=ax,scale=100)
+		tax = ternary.TernaryAxesSubplot(ax=ax, scale=100)
 
-		tax.gridlines(color="blue", multiple=5,zorder=-1)
+		tax.gridlines(color="blue", multiple=5, zorder=-1)
+		tax.boundary(linewidth=1.25)
 
-		tax.ticks(linewidth=2, multiple=10)
+		tax.ticks(linewidth=2, multiple=10, offset=0.014)
 
 		ax.axis('off')
 
@@ -84,9 +110,9 @@ def plot_data(csv,out):
 
 		tax.legend(frameon=False, scatterpoints=1, handletextpad=0, bbox_to_anchor = (1.08, 1.15))
 
-		ternary.plt.subplots_adjust(left=0.08,right=0.9,top=0.85, bottom=0.06)
+		ternary.plt.subplots_adjust(left=0.08, right=0.9, top=0.85, bottom=0.06)
 
-		tax.savefig(filename=plot_buff, format='png',dpi=300)
+		tax.savefig(filename=plot_buff, format='png', dpi=300)
 
 		out.writestr('diagram_' + time.strftime("%Y%m%d_%H%M%S") + '.png', plot_buff.getvalue())
 		plot_buff.close()
