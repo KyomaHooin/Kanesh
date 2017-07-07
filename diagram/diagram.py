@@ -10,7 +10,9 @@ except:
 	print("Failed to read input.")
 	sys.exit(1)
 
-clr = ('#DC143C','#EE1289','#0000FF','#00CDCD','#00C957','#9ACD32','#FFD700','#EE7600','#FF0000')
+
+clr = ('#F3C300','#875692','#F38400','#A1CAF1','#BE0032','#C2B280','#848482','#008856','#E68FAC','#0067A5',
+	'#F99379','#604E97','#F6A600','#B3446C','#DCD300','#882D17','#8DB600','#654522','#E25822','#2B3D26')
 
 #---------------------------
 
@@ -57,15 +59,16 @@ std = numpy.unique(data[1:,3])# unique 4th column from 2nd row
 #BASE
 
 figure, ax = pyplot.subplots(figsize=(8,8), facecolor='white')
-tax = ternary.TernaryAxesSubplot(ax=ax,scale=100)
+tax = ternary.TernaryAxesSubplot(ax=ax, scale=100)
 
-#GRID
+#GRID/BOUNDARY
 
-tax.gridlines(color="blue", multiple=5,zorder=-1)
+tax.gridlines(color="blue", multiple=5, zorder=-1)
+tax.boundary(linewidth=1.25)
 
 #TICK
 
-tax.ticks(linewidth=2, multiple=10)
+tax.ticks(linewidth=2, multiple=10, offset=0.014)
 
 #AXIS
 
@@ -91,7 +94,7 @@ tax._redraw_labels()
 
 #SCATTER
 
-scatter_data(data,std)
+scatter_data(data, std)
 
 #LEGEND
 
@@ -99,10 +102,10 @@ tax.legend(frameon=False, scatterpoints=1, handletextpad=0, bbox_to_anchor = (1.
 
 #SAVE/DISPLAY
 
-ternary.plt.subplots_adjust(left=0.08,right=0.9,top=0.85, bottom=0.06)
+ternary.plt.subplots_adjust(left=0.08, right=0.9, top=0.85, bottom=0.06)
 
-#tax.show()
-tax.savefig(filename='demo.png', format='png',dpi=300)
+tax.show()
+#tax.savefig(filename='demo.png', format='png', dpi=300)
 
 #CLEANUP
 
