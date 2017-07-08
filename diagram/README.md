@@ -17,10 +17,10 @@ apt-get install python-numpy python-scipy python-matplotlib libapache2-mod-wsgi
 </pre>
 INPUT
 <pre>
-Mg;Al;Fe;Std
-43.7623762376;30.2310231023;26.0066006601;Grey Beige
-42.4205378973;30.0733496333;27.5061124694;Grey Beige
-45.0106157113;30.7855626327;24.2038216561;Grey Beige
+Mg;Al; .. ;Fe;Std
+43.7623762376;30.2310231023; .. ;26.0066006601;Grey Beige
+42.4205378973;30.0733496333; .. ;27.5061124694;Grey Beige
+45.0106157113;30.7855626327; .. ;24.2038216561;Grey Beige
 </pre>
 FILE
 <pre>
