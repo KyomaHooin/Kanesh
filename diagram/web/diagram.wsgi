@@ -134,7 +134,7 @@ def plot_data(csv,elm,out):
 		return '<font style="padding-left: 42px;" color="red">Chyba při generování grafu.</font>'
 
 def is_valid_csv(data):
-	for line in data.splitlines()[2:]:
+	for line in data.splitlines()[1:]:
 		if len(line.split(';')) != 23: return 0
 	return 1
 

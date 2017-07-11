@@ -17,7 +17,7 @@ clr = ('#F3C300','#875692','#F38400','#A1CAF1','#BE0032','#C2B280','#848482','#0
 #---------------------------
 
 def is_valid_csv(fh):
-	for line in fh.readlines()[2:]:
+	for line in fh.readlines()[1:]:
 		if len(line.split(';')) != 23: return 0
 	fh.seek(0)#return
 	return 1
