@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
-import ternary,numpy,sys
+import StringIO,ternary,numpy,sys
 
 from matplotlib import pyplot
 
 try:
-	f = open('input.csv','r')
+	f = open('input_color.csv','r')
 except:
 	print("Failed to read input.")
 	sys.exit(1)
@@ -16,45 +16,71 @@ clr = ('#F3C300','#875692','#F38400','#A1CAF1','#BE0032','#C2B280','#848482','#0
 
 #---------------------------
 
-def is_csv(fn):
-	for line in fn.readlines():
-		if len(line.split(';')) != 4: return 0
+def is_valid_csv(fh):
+	for line in fh.readlines()[2:]:
+		if len(line.split(';')) != 23: return 0
+	fh.seek(0)#return
 	return 1
 
-def parse_csv(fn):
-	fn.seek(0)# not required in file buffer
+def parse_csv(fh):
+	s = fh.read().replace(',','.')
+	fh.close()
 	return numpy.genfromtxt(
-			fn,
+			StringIO.StringIO(s),
 			delimiter=';',
 			autostrip=True,
-			dtype=None
+			dtype=None,
+			skip_header=1
 		)
 
-def scatter_data(dat,std):
-	for s in std:
+def parse_data(data,sel):
+	row = numpy.shape(data)[0]
+	out = numpy.empty([row - 1,3])
+	std = data[1:,-1]
+
+	for i in range(1,row):
+		e1 = data[i,data[0,:] == sel[0]].astype(float)
+		e2 = data[i,data[0,:] == sel[1]].astype(float)
+		e3 = data[i,data[0,:] == sel[2]].astype(float)
+		summ = numpy.sum([e1, e2, e3])
+		out[i - 1,0] = e1 / summ * 100 
+		out[i - 1,1] = e2 / summ * 100 
+		out[i - 1,2] = e3 / summ * 100
+
+	return numpy.concatenate((out,std[:,None]),-1)
+
+def scatter_data(data,std):
+	for st in std:
 		tax.scatter(
-			dat[dat[:,3] == s,:3].astype(float),
+			data[data[:,3] == st,:3].astype(float),
 			marker='o',
 			edgecolor='black',
 			linewidth='1',
 			s=50,
-			color=clr[list(std).index(s)],
-			label=s
+			color=clr[list(std).index(st)],
+			label=st
 		)
-	
+
 #---------------------------
 
 #VAR
 
-if is_csv(f):
-	data = parse_csv(f)
+if is_valid_csv(f):
+	raw = parse_csv(f)
 else:
 	print "Invalid input."
 	sys.exit(2)
 
-element = data[0,:3]# 1st row no 4th column
+subset = numpy.delete(raw,1,0)
+subset = numpy.delete(subset,0,1)
+subset = numpy.delete(subset,0,1)
+subset = numpy.delete(subset,range(1,numpy.shape(subset)[1],2),1)# SD
 
-std = numpy.unique(data[1:,3])# unique 4th column from 2nd row
+element=('Mg','Al','Fe')
+
+data = parse_data(subset,element)
+
+std = numpy.unique(data[1:,-1])
 
 #BASE
 
@@ -106,8 +132,4 @@ ternary.plt.subplots_adjust(left=0.08, right=0.9, top=0.85, bottom=0.06)
 
 tax.show()
 #tax.savefig(filename='demo.png', format='png', dpi=300)
-
-#CLEANUP
-
-f.close()
 

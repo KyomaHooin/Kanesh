@@ -54,26 +54,38 @@ def plot_data(csv,elm,out):
 	try:
 
 		plot_buff = StringIO.StringIO()
+	
+	 	csv = csv.replace(',','.')#replace comma
 
 		data = numpy.genfromtxt(
 				StringIO.StringIO(csv),
 				delimiter=';',
 				autostrip=True,
-				dtype=None
+				dtype=None,
+				skip_header=1
 			)
 
-		for e in elm:
-			if e not in data[0,:-1]:
-				return '<font style="padding-left: 42px;" color="red">CSV neobsahuje všechny prvky!</font>'
+		subset = numpy.delete(data,1,0)
+		subset = numpy.delete(subset,0,1)
+		subset = numpy.delete(subset,0,1)
+		subset = numpy.delete(subset,range(1,numpy.shape(subset)[1],2),1)# SD
 
-		subset = numpy.hstack((
-				data[:,data[0,:] == elm[0]],
-				data[:,data[0,:] == elm[1]],
-				data[:,data[0,:] == elm[2]],
-				data[:,[-1]]
-			))
+		row = numpy.shape(subset)[0]
+		raw = numpy.empty([row - 1,3])
+		st = subset[1:,-1]
 
-		std = numpy.unique(data[1:,-1])
+		for i in range(1,row):
+			e1 = subset[i,subset[0,:] == elm[0]].astype(float)
+			e2 = subset[i,subset[0,:] == elm[1]].astype(float)
+			e3 = subset[i,subset[0,:] == elm[2]].astype(float)
+			summ = numpy.sum([e1, e2, e3])
+			raw[i - 1,0] = e1 / summ * 100
+			raw[i - 1,1] = e2 / summ * 100
+			raw[i - 1,2] = e3 / summ * 100
+		
+		raw = numpy.concatenate((raw,st[:,None]),-1)
+		
+		std = numpy.unique(raw[1:,-1])
 
 		figure, ax = pyplot.subplots(figsize=(8,8), facecolor='white')
 		tax = ternary.TernaryAxesSubplot(ax=ax, scale=100)
@@ -101,7 +113,7 @@ def plot_data(csv,elm,out):
 
 		for st in std:
 			tax.scatter(
-				subset[subset[:,3] == st,:3].astype(float),
+				raw[raw[:,3] == st,:3].astype(float),
 				marker='o',
 				edgecolor='black',
 				linewidth='1',
@@ -121,9 +133,9 @@ def plot_data(csv,elm,out):
 	except:
 		return '<font style="padding-left: 42px;" color="red">Chyba při generování grafu.</font>'
 
-def is_csv(data):
-	for line in data.splitlines():
-		if len(line.split(';')) < 4: return 0
+def is_valid_csv(data):
+	for line in data.splitlines()[2:]:
+		if len(line.split(';')) != 23: return 0
 	return 1
 
 #---------------------------
@@ -158,7 +170,7 @@ def application(environ, start_response):
 	elif len(checked) == 3:
 		if 'file' in form.keys():
 			if form['file'].value:
-				if is_csv(form['file'].value):
+				if is_valid_csv(form['file'].value):
 					payload = zipfile.ZipFile(zip_buff, mode='a', compression=zipfile.ZIP_DEFLATED)
 					html_msg = plot_data(form['file'].value.decode('utf-8'),checked,payload)
 					payload.close()
