@@ -6,11 +6,6 @@ Write ternary diagram plot from CSV data.
 
 INSTALL
 <pre>
-R
-
-install.packages('ggtern')
-install.packages('hash')
-
 PYTHON
 
 apt-get install python-numpy python-scipy python-matplotlib libapache2-mod-wsgi
