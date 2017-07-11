@@ -16,7 +16,7 @@ html_head = """
 <head><meta charset="utf-8"></head>
 <body>
 <img src="/media/python-powered.png">
-<br><p style="padding-left: 42px;">[ Formát CSV: <b>Element;Element; .. ;Element;STD</b> ]</p>
+<br><p style="padding-left: 42px;">[ Formát CSV: <b>ArtaxCalc;Std</b> ]</p>
 <form style="padding-left: 42px;" enctype="multipart/form-data" action="diagram" method="post">
 <b>Soubor CSV</b>: <input style="background-color:#ddd;" type="file" name="file"><br><br>
 <table>
