@@ -2,6 +2,7 @@
 ; Helper clipboard data extraction function for Bruker Artax 400 binary program.
 ;
 ; _Artax_Patch .............. Patch program registry and INI configuration.
+; _Artax_PatchMethod ........ Patch program default calibration method.
 ; _Artax_GetSpectra ......... Return project spectra names.
 ; _Artax_GetClean ........... Clean the clipboard.
 ; _Artax_GetTableEx ......... Clipboard CF_TEXT to CSV file.
@@ -75,6 +76,20 @@ func _Artax_Patch($inifile)
 
 	for $i = 0 to ubound($ptform) - 1
 		RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\PTForm', $ptform[$i][0], 'REG_SZ', $ptform[$i][1])
+	next
+EndFunc
+
+; Patch default calibration method.
+func _Artax_PatchMethod($mthfile)
+	_XMLLoadXML(FileRead($mthfile))
+	if @error then return SetError(1,0,"Method XML error.")
+	for $i = 0 to 100
+		$cal = _XMLGetValue('/Method/Method_' & $i & '/CalibFile')
+		if @error then return SetError(1,0,"Method XML node count error.")
+		if StringRegExpReplace($cal[1], '.*\\(.*)$', "$1") == 'JA-1+JA-2_He_12,5ekV_1300uA_200s_2x3.cal' then
+			RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm', 'MethodComboBoxItem_Tag', 'REG_DWORD', $i)
+			return
+		endif
 	next
 EndFunc
 
