@@ -83,14 +83,19 @@ EndFunc
 func _Artax_PatchMethod($mthfile)
 	_XMLLoadXML(FileRead($mthfile))
 	if @error then return SetError(1,0,"Method XML error.")
-	for $i = 0 to 100
+	$count = _XMLGetChildNodes('/Method')
+	if @error then return SetError(1,0,"Method XML node count error.")
+	$cnt = UBound($count) - 2
+	local $name[$cnt][2]
+	for $i = 0 to $cnt - 1
+		$mthname = _XMLGetValue('/Method/Method_' & $i & '/MethodName')
+		if not @error then $name[$i][0] = $mthname[1]
 		$cal = _XMLGetValue('/Method/Method_' & $i & '/CalibFile')
-		if @error then return SetError(1,0,"Method XML node count error.")
-		if StringRegExpReplace($cal[1], '.*\\(.*)$', "$1") == 'JA-1+JA-2_He_12,5ekV_1300uA_200s_2x3.cal' then
-			RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm', 'MethodComboBoxItem_Tag', 'REG_DWORD', $i)
-			return
-		endif
-	next
+		if not @error then $name[$i][1] = StringRegExpReplace($cal[1], '.*\\(.*)$', "$1")
+	Next
+	_ArraySort($name)
+	$index = _ArraySearch($name, 'JA-1+JA-2_He_12,5ekV_1300uA_200s_2x3.cal')
+	RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm', 'MethodComboBoxItem_Tag', 'REG_DWORD', $index)
 EndFunc
 
 ; Spectra name array from project XML file.
