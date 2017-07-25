@@ -149,21 +149,11 @@ While 1
 							;---- spectra ----
 							for $k = 0 to UBound($spectra_name) - 1
 								Send('{DOWN}')
-								;---- periodic table ----
-								if $k = 0 then
-									sleep(500)
-									Send('^t')
-									$pt = WinWaitActive('Periodic Table of the Elements','', 10)
-									Sleep(100); hold on a micro
-									Send('llmm')
-									Sleep(100); hold on a micro
-									WinClose($pt)
-								EndIf
 								;---- method ----
 								if GUICtrlRead($method_check) = $GUI_CHECKED then
+									Sleep(100); hold on a micro
 									Send('^v')
 									$mth = WinWaitActive('Confirm','', 10)
-									Sleep(100); hold on a micro
 									Send('Y')
 									Sleep(100); hold on a micro
 									$mtherr = WinGetHandle('','')
@@ -172,6 +162,16 @@ While 1
 										WinClose($openerr)
 										ExitLoop
 									endif
+								EndIf
+								;---- periodic table ----
+								if $k = 0 or GUICtrlRead($method_check) = $GUI_CHECKED then
+									sleep(500)
+									Send('^t')
+									$pt = WinWaitActive('Periodic Table of the Elements','', 10)
+									Sleep(100); hold on a micro
+									Send('llmm')
+									Sleep(100); hold on a micro
+									WinClose($pt)
 								EndIf
 								;---- table ----
 								Send('^d')
