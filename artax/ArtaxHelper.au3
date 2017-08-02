@@ -94,7 +94,7 @@ func _Artax_PatchMethod($mthfile)
 		if not @error then $name[$i][1] = StringRegExpReplace($cal[1], '.*\\(.*)$', "$1")
 	Next
 	_ArraySort($name)
-	$index = _ArraySearch($name, 'JA-1+JA-2_He_12,5ekV_1300uA_200s_2x3.cal')
+	$index = _ArraySearch($name, 'PLATNA_HLINAJA-1+JA-2_He_12,5ekV_1300uA_200s_2x3.cal')
 	RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm', 'MethodComboBoxItem_Tag', 'REG_DWORD', $index)
 EndFunc
 
