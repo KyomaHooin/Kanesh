@@ -22,5 +22,5 @@ _XMLDomWrapper.au3 - XML library by Stephen Podhajecki.
 CONTACT
 
 Author: richard_bruna@nm.cz<br>
-Source: https://github.com/KyomaHooin/Sumerian
+Source: https://github.com/KyomaHooin/Kanesh
 
