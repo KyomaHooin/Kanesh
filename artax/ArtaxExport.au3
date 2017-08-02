@@ -25,7 +25,7 @@ DirCreate(@scriptdir & '\export')
 if UBound(ProcessList(@ScriptName)) > 2 then exit; already running
 
 ;GUI
-$gui = GUICreate("ArtaxExport v 2.3", 351, 91)
+$gui = GUICreate("ArtaxExport v 2.4", 351, 91)
 $label_path = GUICtrlCreateLabel("Projekt:", 6, 10, 35, 21)
 $gui_path = GUICtrlCreateInput($path_history, 46, 8, 217, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
@@ -33,7 +33,7 @@ $label_exec = GUICtrlCreateLabel("Artax:", 15, 35, 32, 21)
 $gui_exec = GUICtrlCreateInput($exec_history, 46, 33, 217, 21)
 $button_exec = GUICtrlCreateButton("Prochazet", 270, 33, 75, 21)
 $gui_error = GUICtrlCreateLabel("", 8, 66, 115, 15)
-$method_check = GUICtrlCreateCheckbox("opravaoprava", 128, 65, 52, 15)
+$method_check = GUICtrlCreateCheckbox("oprava", 128, 65, 52, 15)
 $button_export = GUICtrlCreateButton("Export", 188, 63, 75, 21)
 $button_exit = GUICtrlCreateButton("Konec", 270, 63, 75, 21)
 
