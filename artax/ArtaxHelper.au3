@@ -95,7 +95,8 @@ func _Artax_PatchMethod($mthfile)
 	Next
 	_ArraySort($name)
 	$index = _ArraySearch($name, 'PLATNA_HLINAJA-1+JA-2_He_12,5ekV_1300uA_200s_2x3.cal')
-	RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm', 'MethodComboBoxItem_Tag', 'REG_DWORD', $index)
+	if $index >= 0 then RegWrite('HKEY_CURRENT_USER\Software\Bruker-AXS\ARTAX\MainForm', 'MethodComboBoxItem_Tag', 'REG_DWORD', $index)
+	return $index
 EndFunc
 
 ; Spectra name array from project XML file.

@@ -25,14 +25,14 @@ DirCreate(@scriptdir & '\export')
 if UBound(ProcessList(@ScriptName)) > 2 then exit; already running
 
 ;GUI
-$gui = GUICreate("ArtaxExport v 2.4", 351, 91)
+$gui = GUICreate("ArtaxExport v 2.5", 351, 91)
 $label_path = GUICtrlCreateLabel("Projekt:", 6, 10, 35, 21)
 $gui_path = GUICtrlCreateInput($path_history, 46, 8, 217, 21)
 $button_path = GUICtrlCreateButton("Prochazet", 270, 8, 75, 21)
 $label_exec = GUICtrlCreateLabel("Artax:", 15, 35, 32, 21)
 $gui_exec = GUICtrlCreateInput($exec_history, 46, 33, 217, 21)
 $button_exec = GUICtrlCreateButton("Prochazet", 270, 33, 75, 21)
-$gui_error = GUICtrlCreateLabel("", 8, 66, 115, 15)
+$gui_error = GUICtrlCreateLabel("", 8, 66, 125, 15)
 $method_check = GUICtrlCreateCheckbox("oprava", 128, 65, 52, 15)
 $button_export = GUICtrlCreateButton("Export", 188, 63, 75, 21)
 $button_exit = GUICtrlCreateButton("Konec", 270, 63, 75, 21)
@@ -59,27 +59,29 @@ While 1
 	EndIf
 	if $event = $button_export Then; export
 		$project_list = _FileListToArray(GUICtrlRead($gui_path), "*.rtx", 1, True)
+		; ---- patch ----
+		$patch = _Artax_Patch(GUICtrlRead($gui_exec) & '\ARTAX.ini')
+		if @error then logger($patch)
+		; ---- patch method ----
+		if GuiCtrlRead($method_check) = $GUI_CHECKED then
+			$method = _Artax_PatchMethod(GUICtrlRead($gui_exec) & '\ARTAX.mth')
+			if @error then logger($method)
+		endif
 		if GUICtrlRead($gui_path) == '' or GUICtrlRead($gui_exec) == '' then
-			GUICtrlSetData($gui_error, "Chyba: Prazdna cesta.")
+			GUICtrlSetData($gui_error, "E: Prázdná cesta.")
 		elseif not FileExists(GUICtrlRead($gui_exec) & '\ARTAX.exe') Then
-			GUICtrlSetData($gui_error, "Chyba: Program nenalezen.")
+			GUICtrlSetData($gui_error, "E: Cesta programu.")
 		elseif not FileExists(GUICtrlRead($gui_exec) & '\ARTAX.ini') Then
-			GUICtrlSetData($gui_error, "Chyba: Konfigurace nenalezena.")
+			GUICtrlSetData($gui_error, "E: Konfigurace.")
 		elseif not FileExists(GUICtrlRead($gui_path)) then
-			GUICtrlSetData($gui_error, "Chyba: Adresar projektu neexistuje.")
+			GUICtrlSetData($gui_error, "E: Adresář projektu.")
 		elseif UBound($project_list) < 2 then
-			GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
+			GUICtrlSetData($gui_error, "E: Neobsahuje data.")
 		elseif UBound(ProcessList('ARTAX.exe')) >= 2 then
-			GUICtrlSetData($gui_error, "Chyba: Ukoncete bezici program.")
+			GUICtrlSetData($gui_error, "E: Běžící program.")
+		elseif GuiCtrlRead($method_check) = $GUI_CHECKED and $method <= 0 then
+			GUICtrlSetData($gui_error, "E: Nastavení metody.")
 		else
-			; ---- patch ----
-			$patch = _Artax_Patch(GUICtrlRead($gui_exec) & '\ARTAX.ini')
-			if @error then logger($patch)
-			; ---- patch method ----
-			if GuiCtrlRead($method_check) = $GUI_CHECKED then
-				$method = _Artax_PatchMethod(GUICtrlRead($gui_exec) & '\ARTAX.mth')
-				if @error then logger($method)
-			endif
 			; ---- cleanup ----
 			_Artax_GetClean()
 			; ---- ATX ----
