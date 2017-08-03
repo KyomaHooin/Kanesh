@@ -79,7 +79,7 @@ While 1
 			GUICtrlSetData($gui_error, "E: Neobsahuje data.")
 		elseif UBound(ProcessList('ARTAX.exe')) >= 2 then
 			GUICtrlSetData($gui_error, "E: Běžící program.")
-		elseif GuiCtrlRead($method_check) = $GUI_CHECKED and $method <= 0 then
+		elseif GuiCtrlRead($method_check) = $GUI_CHECKED and $method < 0 then
 			GUICtrlSetData($gui_error, "E: Nastavení metody.")
 		else
 			; ---- cleanup ----
