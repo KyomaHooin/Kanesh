@@ -1,0 +1,55 @@
+#!/usr/bin/python
+
+from neo4j.v1 import GraphDatabase
+
+driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "[removed]"))
+
+session = driver.session()
+
+#result = session.run("MATCH (a:Tablet) WHERE a.name = 'i478'" "RETURN a.name AS name")
+result = session.run("CREATE")
+
+#for record in result: print record["name"]
+#for record in result: print record
+
+session.close()
+
+#:Tablet
+#:Tablet.name
+#:Tablet.foto
+#:Tablet.descr
+
+#CREATE (:Tablet {name:'i478', foto:'i478_foto.png', descr:'tmavehneda desticka'})
+
+#-> HAS_DIMENSION
+
+#:Dimension
+#:Dimension.depth
+#:Dimension.width
+#:Dimension.height
+
+#MATCH (t:Tablet) WHERE t.name='i478' CREATE (t)-[:HAS_DIMENSION ]->(:Dimension {depth:20, width:15, height:5})
+
+#-> HAS_COLOR
+
+#:Color
+#:Color.cie
+#:Color.rgb
+#:Colot.ternary ?
+#:Color.L
+#:Color.a
+#:Color.b
+
+#MATCH (t:Tablet) WHERE t.name='i478' CREATE (t)-[:HAS_COLOR ]->(:Color {cie:'i478_1978.png',srgb:'i478_srgb.png',L:56.7, a:0.314, b:3.5})
+
+#-> HAS_SPECTRA
+
+#:Spectra
+#:Spectra.picture
+#:Spectra.graph
+#:Spectra.csv
+
+#MATCH (t:Tablet) WHERE t.name='i478' CREATE (t)-[:HAS_SPECTRA ]->(:Spectra {picture:'i478_picture.png', graph:'i478_graph.png', csv:'i478.csv'})
+
+#:Element ?
+

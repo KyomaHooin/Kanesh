@@ -9,6 +9,7 @@ SOFTWARE
   color/ - X-Rite RM200CQ.
 diagram/ - Ternary diagram Baycentric plot.
   leica/ - Leica MZ16FA microscope and DFC490 camera.
+    neo/ - Neo4j database software.
 </pre>
 CONTACT
 
