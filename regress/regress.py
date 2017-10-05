@@ -50,15 +50,12 @@ slope, intercept, r_value, p_value, std_err = stats.linregress(set1,set2)
 
 coef = round(stats.pearsonr(set1,set2)[0],2)
 
-print set1
-print set2
-
 plt.subplots(figsize=(8,8), facecolor='white')
 
 #point
 plt.plot(
-	set1,
-	set2,
+	numpy.array(set1),
+	numpy.array(set2),
 	'o',
 	markeredgewidth=1.5,
 	markeredgecolor='black',
@@ -79,6 +76,8 @@ plt.xlabel('Mg',fontsize=13)
 plt.ylabel('Al',fontsize=13)
 
 plt.grid(True)
+
+plt.title(coef, fontsize=20)
 
 #plt.xlim(0,1)
 #plt.ylim(0,1)
