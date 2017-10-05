@@ -49,8 +49,6 @@ f.close()
 
 tablet = get_tablet()
 
-print tablet
-
 set1 = [float(x) for x in get_edata('Mg',tablet)]
 set2 = [float(x) for x in get_edata('Al',tablet)]
 
@@ -58,7 +56,7 @@ slope, intercept, r_value, p_value, std_err = stats.linregress(set1,set2)
 
 coef = round(stats.pearsonr(set1,set2)[0],2)
 
-plt.subplots(figsize=(8,8), facecolor='white')
+plt.subplots(figsize=(8,7), facecolor='white')
 
 for t in tablet:
 	t_set1 = [float(x) for x in get_tdata('Mg',t)]
@@ -80,7 +78,7 @@ plt.plot(
 	numpy.array(set1),
 	intercept + slope*numpy.array(set1),
 	'black',
-	linewidth=2
+	linewidth=1.5
 	)
 
 plt.xlabel('Mg',fontsize=13)
@@ -90,11 +88,10 @@ plt.grid(True)
 
 plt.title(coef, fontsize=20)
 
-#plt.xlim(0,1)
-#plt.ylim(0,1)
+plt.subplots_adjust( left=0.1,right=0.8)
 
-plt.legend(frameon=False)
+plt.legend(frameon=False, numpoints=1, loc='center left',bbox_to_anchor=(1,0.5))
 
-#plt.savefig(filename='regress.png', format='png', dpi=300)
-plt.show()
+plt.savefig(filename='regress.png', format='png', dpi=300)
+#plt.show()
 
