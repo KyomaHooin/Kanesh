@@ -33,6 +33,12 @@ def get_edata(e,tab):
 				ed += data[i][2:]
 	return ed
 
+def get_tdata(e,tab):
+	et = []
+	for i in range(0,len(data)):
+		if data[i][0] == tab and data[i][1] == e:
+				return data[i][2:]
+
 #--------------------------------
 
 f = open('input.csv','r')
@@ -43,8 +49,10 @@ f.close()
 
 tablet = get_tablet()
 
-set1 =[float(x) for x in get_edata('Mg',tablet)]
-set2 =[float(x) for x in get_edata('Al',tablet)]
+print tablet
+
+set1 = [float(x) for x in get_edata('Mg',tablet)]
+set2 = [float(x) for x in get_edata('Al',tablet)]
 
 slope, intercept, r_value, p_value, std_err = stats.linregress(set1,set2)
 
@@ -52,16 +60,19 @@ coef = round(stats.pearsonr(set1,set2)[0],2)
 
 plt.subplots(figsize=(8,8), facecolor='white')
 
-#point
-plt.plot(
-	numpy.array(set1),
-	numpy.array(set2),
-	'o',
-	markeredgewidth=1.5,
-	markeredgecolor='black',
-	markerfacecolor=clr[5],
+for t in tablet:
+	t_set1 = [float(x) for x in get_tdata('Mg',t)]
+	t_set2 = [float(x) for x in get_tdata('Al',t)]
+ 
+	plt.plot(
+		numpy.array(t_set1),
+		numpy.array(t_set2),
+		'o',
+		markeredgewidth=1.5,
+		markeredgecolor='black',
+		markerfacecolor=clr[list(tablet).index(t)],
 	markersize='7',
-#	label='J3145'
+	label=t
 	)
 
 #line
@@ -82,7 +93,7 @@ plt.title(coef, fontsize=20)
 #plt.xlim(0,1)
 #plt.ylim(0,1)
 
-#plt.legend(frameon=False)
+plt.legend(frameon=False)
 
 #plt.savefig(filename='regress.png', format='png', dpi=300)
 plt.show()
