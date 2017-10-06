@@ -1,4 +1,4 @@
-![Color](https://github.com/KyomaHooin/Sumerian/raw/master/color/color_screen.png "screenshot")
+![Color](https://github.com/KyomaHooin/Kanesh/raw/master/color/color_screen.png "screenshot")
 
 DESCRIPTION
 

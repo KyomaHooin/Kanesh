@@ -1,0 +1,43 @@
+![Regress](https://github.com/KyomaHooin/Kanesh/raw/master/regress/regress_screen.png "screenshot")
+
+DESCRIPTION
+
+Correlation coefficient and linear regression plot from CSV output.  
+
+INSTALL
+<pre>
+apt-get install python-numpy python-scipy python-matplotlib libapache2-mod-wsgi
+</pre>
+CONFIG
+<pre>
+/etc/apache2/sites-enabled/default-ssl.conf:
+
+&lt;Directory /var/www/media&gt;
+    Options -Indexes -Multiviews
+    Order allow,deny
+    Allow from all
+&lt;/Directory&gt;
+
+WSGIScriptAlias /color /var/www/regress/regress.wsgi
+WSGIApplicationGroup %{GLOBAL}
+</pre>
+INPUT
+<pre>
+J464B;Na;0.0201335908;0.0201335908;0.0201335908;0.0201335908
+J464B;Mg;3.9191309186;3.9398827464;4.0928533632;5.0005976047
+J464B;Al;6.008699247;5.5575518959;5.2356014767;4.2395348077
+....
+</pre>
+FILE
+<pre>
+  web/regress.wsgi - WSGI frontend.
+
+        regress.py - Stand-alone script.
+regress_screen.png - Web screenshot.
+</pre>
+
+CONTACT
+
+Author: richard_bruna@nm.cz<br>
+Source: https://github.com/KyomaHooin/Kanesh
+

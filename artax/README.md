@@ -1,4 +1,4 @@
-![Artax](https://github.com/KyomaHooin/Sumerian/raw/master/artax/artax_screen.png "screenshot")
+![Artax](https://github.com/KyomaHooin/Kanesh/raw/master/artax/artax_screen.png "screenshot")
 
 DESCRIPTION
 

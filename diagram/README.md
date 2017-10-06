@@ -1,4 +1,4 @@
-![Diagram](https://github.com/KyomaHooin/Sumerian/raw/master/diagram/diagram_screen.png "screenshot")
+![Diagram](https://github.com/KyomaHooin/Kanesh/raw/master/diagram/diagram_screen.png "screenshot")
 
 DESCRIPTION
 
