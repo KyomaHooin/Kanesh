@@ -158,11 +158,9 @@ def application(environ, start_response):
 		elif not_valid_csv(form['file'].value):
 			html_msg = '<font style="padding-left: 42px;" color="red">Neplatné CSV.</font>'
 		else:
-			#regress(form['file'].value.decode('utf-8'),form['e1'].value,form['e2'].value)
 			html_msg +=('<img src="data:image/jpeg;base64,'
 			+ base64.b64encode(regress(form['file'].value.decode('utf-8'),form['e1'].value,form['e2'].value))
 			+ '">')
-			#html_msg = regress(form['file'].value.decode('utf-8'),form['e1'].value,form['e2'].value)
 
 	response_headers = [
 		('Content-type', 'text/html'),
