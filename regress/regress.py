@@ -3,6 +3,7 @@
 import numpy
 
 from scipy import stats
+from itertools import combinations
 
 import matplotlib.pyplot as plt
 
@@ -49,49 +50,47 @@ f.close()
 
 tablet = get_tablet()
 
-set1 = [float(x) for x in get_edata('Mg',tablet)]
-set2 = [float(x) for x in get_edata('Al',tablet)]
+def plot_all(c):
 
-slope, intercept, r_value, p_value, std_err = stats.linregress(set1,set2)
+	set1 = [float(x) for x in get_edata(c[0],tablet)]
+	set2 = [float(x) for x in get_edata(c[1],tablet)]
 
-coef = round(stats.pearsonr(set1,set2)[0],2)
+	slope, intercept, r_value, p_value, std_err = stats.linregress(set1,set2)
 
-plt.subplots(figsize=(8,7), facecolor='white')
+	coef = round(stats.pearsonr(set1,set2)[0],2)
 
-for t in tablet:
-	t_set1 = [float(x) for x in get_tdata('Mg',t)]
-	t_set2 = [float(x) for x in get_tdata('Al',t)]
+	plt.subplots(figsize=(8,7), facecolor='white')
+
+	for t in tablet:
+		t_set1 = [float(x) for x in get_tdata(c[0],t)]
+		t_set2 = [float(x) for x in get_tdata(c[1],t)]
  
+		plt.plot(
+			numpy.array(t_set1),
+			numpy.array(t_set2),
+			'o',
+			markeredgewidth=1.5,
+			markeredgecolor='black',
+			markerfacecolor=clr[list(tablet).index(t)],
+			markersize='7',
+			label=t
+			)
+
 	plt.plot(
-		numpy.array(t_set1),
-		numpy.array(t_set2),
-		'o',
-		markeredgewidth=1.5,
-		markeredgecolor='black',
-		markerfacecolor=clr[list(tablet).index(t)],
-	markersize='7',
-	label=t
+		numpy.array(set1),
+		intercept + slope*numpy.array(set1),
+		'black',
+		linewidth=1.5
 	)
 
-#line
-plt.plot(
-	numpy.array(set1),
-	intercept + slope*numpy.array(set1),
-	'black',
-	linewidth=1.5
-	)
+	plt.xlabel(c[0],fontsize=13)
+	plt.ylabel(c[1],fontsize=13)
+	plt.grid(True)
+	plt.title(coef, fontsize=20)
+	plt.subplots_adjust( left=0.1,right=0.8)
+	plt.legend(frameon=False, numpoints=1, loc='center left',handletextpad=0, bbox_to_anchor=(1,0.5))
+	plt.savefig(filename='regress_'+ c[0] + '_' + c[1] + '.png', format='png', dpi=300)
+	plt.close()
 
-plt.xlabel('Mg',fontsize=13)
-plt.ylabel('Al',fontsize=13)
-
-plt.grid(True)
-
-plt.title(coef, fontsize=20)
-
-plt.subplots_adjust( left=0.1,right=0.8)
-
-plt.legend(frameon=False, numpoints=1, loc='center left',handletextpad=0, bbox_to_anchor=(1,0.5))
-
-#plt.savefig(filename='figure.png', format='png', dpi=300)
-plt.show()
-
+for i in combinations(element,2):
+	plot_all(i)
