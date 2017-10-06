@@ -90,8 +90,8 @@ plt.title(coef, fontsize=20)
 
 plt.subplots_adjust( left=0.1,right=0.8)
 
-plt.legend(frameon=False, numpoints=1, loc='center left',bbox_to_anchor=(1,0.5))
+plt.legend(frameon=False, numpoints=1, loc='center left',handletextpad=0, bbox_to_anchor=(1,0.5))
 
-plt.savefig(filename='regress.png', format='png', dpi=300)
-#plt.show()
+#plt.savefig(filename='figure.png', format='png', dpi=300)
+plt.show()
 
