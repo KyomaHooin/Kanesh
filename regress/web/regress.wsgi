@@ -155,18 +155,17 @@ def application(environ, start_response):
 	html_msg = ''
 
 	if 'file' in form.keys():
-		with open(ramfile,'w') as f:
-			f.write(form['file'].value)
+		if form['file'].value:
+			with open(ramfile,'w') as f:
+				f.write(form['file'].value)
 	try:
 		with open(ramfile,'r') as f: data = f.read()
 	except: data = ''
 
 	if data:
-		if 'e1' and 'e2' not in form.keys():
-			html_msg = '<font style="padding-left: 42px;" color="red">Neplatný výběr prvků!</font>'
-		elif not_valid_csv(data):
+		if not_valid_csv(data):
 			html_msg = '<font style="padding-left: 42px;" color="red">Neplatné CSV.</font>'
-		else:
+		elif 'e1' and 'e2' in form.keys():
 			html_msg +=('<img src="data:image/jpeg;base64,'
 				+ base64.b64encode(regress(data.decode('utf-8'),form['e1'].value,form['e2'].value))
 				+ '">')
