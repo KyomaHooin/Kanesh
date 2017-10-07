@@ -48,10 +48,12 @@ clr = ('#F3C300','#875692','#F38400','#A1CAF1','#BE0032','#C2B280','#848482','#0
 
 element = ('Na','Mg','Al','Si','P','K','Ca','Ti','Mn','Fe')
 
+ramfile = '/var/www/regress/ram/data'
+
 #---------------------------
 
-def not_valid_csv(data):
-	for line in data.splitlines()[1:]:
+def not_valid_csv(d):
+	for line in d.splitlines()[1:]:
 		if line.split(';')[1] not in element: return 1
 	return 0
 
@@ -151,16 +153,23 @@ def application(environ, start_response):
 	form = cgi.FieldStorage(fp=body_buff, environ=environ, keep_blank_values=True)
 
 	html_msg = ''
-	
+
 	if 'file' in form.keys():
+		with open(ramfile,'w') as f:
+			f.write(form['file'].value)
+	try:
+		with open(ramfile,'r') as f: data = f.read()
+	except: data = ''
+
+	if data:
 		if 'e1' and 'e2' not in form.keys():
 			html_msg = '<font style="padding-left: 42px;" color="red">Neplatný výběr prvků!</font>'
-		elif not_valid_csv(form['file'].value):
+		elif not_valid_csv(data):
 			html_msg = '<font style="padding-left: 42px;" color="red">Neplatné CSV.</font>'
 		else:
 			html_msg +=('<img src="data:image/jpeg;base64,'
-			+ base64.b64encode(regress(form['file'].value.decode('utf-8'),form['e1'].value,form['e2'].value))
-			+ '">')
+				+ base64.b64encode(regress(data.decode('utf-8'),form['e1'].value,form['e2'].value))
+				+ '">')
 
 	response_headers = [
 		('Content-type', 'text/html'),
