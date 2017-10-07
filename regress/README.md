@@ -10,6 +10,10 @@ apt-get install python-numpy python-scipy python-matplotlib libapache2-mod-wsgi
 </pre>
 CONFIG
 <pre>
+/etc/fstab:
+
+tmpfs	/var/www/regress/ram	tmpfs	nodev,nosuid,size=2M	0	0
+
 /etc/apache2/sites-enabled/default-ssl.conf:
 
 &lt;Directory /var/www/media&gt;
@@ -32,8 +36,8 @@ FILE
 <pre>
   web/regress.wsgi - WSGI frontend.
 
-        regress.py - Stand-alone script.
-regress_screen.png - Web screenshot.
+        regress.py - Stand-alone iteration.
+regress_screen.png - Output screenshot.
 </pre>
 
 CONTACT
