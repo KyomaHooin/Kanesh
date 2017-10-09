@@ -18,22 +18,11 @@ html_head = """
 <br><p style="padding-left: 42px;">[ Formát CSV: <b>tablet;element;value;value;..</b> ]</p>
 <form style="padding-left: 42px;" enctype="multipart/form-data" action="regress" method="post">
 <b>Soubor CSV</b>: <input style="background-color:#ddd;" type="file" name="file"><br><br>
-<table>
-<tr><td><input type="radio" name="e1" value="Na"></td><td>Na</td><td><input type="radio" name="e2" value="Na"></td><td>Na</td></tr>
-<tr><td><input type="radio" name="e1" value="Mg"></td><td>Mg</td><td><input type="radio" name="e2" value="Mg"></td><td>Mg</td></tr>
-<tr><td><input type="radio" name="e1" value="Al"></td><td>Al</td><td><input type="radio" name="e2" value="Al"></td><td>Al</td></tr>
-<tr><td><input type="radio" name="e1" value="Si"></td><td>Si</td><td><input type="radio" name="e2" value="Si"></td><td>Si</td></tr>
-<tr><td><input type="radio" name="e1" value="P"></td><td>P</td><td><input type="radio" name="e2" value="P"></td><td>P</td></tr>
-<tr><td><input type="radio" name="e1" value="K"></td><td>K</td><td><input type="radio" name="e2" value="K"></td><td>K</td></tr>
-<tr><td><input type="radio" name="e1" value="Ca"></td><td>Ca</td><td><input type="radio" name="e2" value="Ca"></td><td>Ca</td></tr>
-<tr><td><input type="radio" name="e1" value="Ti"></td><td>Ti</td><td><input type="radio" name="e2" value="Ti"></td><td>Ti</td></tr>
-<tr><td><input type="radio" name="e1" value="Mn"></td><td>Mn</td><td><input type="radio" name="e2" value="Mn"></td><td>Mn</td></tr>
-<tr><td><input type="radio" name="e1" value="Fe"></td><td>Fe</td><td><input type="radio" name="e2" value="Fe"></td><td>Fe</td></tr>
-</table>
-<br>
+"""
+
+html_body= """
 <input type="submit" value="Plot">
 </form>
-
 """
 
 html_foot = """
@@ -46,16 +35,15 @@ status = '200 OK'
 clr = ('#F3C300','#875692','#F38400','#A1CAF1','#BE0032','#C2B280','#848482','#008856','#E68FAC','#0067A5',
 	'#F99379','#604E97','#F6A600','#B3446C','#DCD300','#882D17','#8DB600','#654522','#E25822','#2B3D26')
 
-element = ('Na','Mg','Al','Si','P','K','Ca','Ti','Mn','Fe')
-
 ramfile = '/var/www/regress/ram/data'
 
 #---------------------------
 
 def not_valid_csv(d):
-	for line in d.splitlines()[1:]:
-		if line.split(';')[1] not in element: return 1
-	return 0
+	try:
+		for line in d.splitlines()[1:]:
+			if len(line.split(';')) < 4: return 0
+	except: return 0
 
 def get_data(d):
 	dt = []
@@ -66,6 +54,18 @@ def get_tablet(d):
 	t = [] 
 	for i in range(0,len(d)): t.append(d[i][0])
 	return numpy.unique(t)
+
+def get_element(d):
+	e = []
+	s = '<table>'
+	for el in range(0,len(d)): e.append(d[el][1])
+	for elm in numpy.unique(e): s +=('<tr><td><input type="radio" name="e1" value="'
+			+ elm + '"></td><td>'
+			+ elm + '</td><td><input type="radio" name="e2" value="'
+			+ elm + '"></td><td>'
+			+ elm + '</td></tr>')
+	s += '</table><br>'
+	return s
 
 def get_edata(e,t,d):
 	ed = []
@@ -81,10 +81,9 @@ def get_tdata(e,t,d):
 		if d[i][0] == t and d[i][1] == e:
 			return d[i][2:]
 
-def regress(csv,el1,el2):
+def regress(data,el1,el2):
 
 	plot_buff = StringIO.StringIO()
-	data = get_data(csv)
 	tablet = get_tablet(data)
 	
 	if not data: return '<b>No data.</b>'
@@ -153,27 +152,34 @@ def application(environ, start_response):
 	form = cgi.FieldStorage(fp=body_buff, environ=environ, keep_blank_values=True)
 
 	html_msg = ''
+	html_elm = ''
 
 	if 'file' in form.keys():
 		if form['file'].value:
 			with open(ramfile,'w') as f:
 				f.write(form['file'].value)
 	try:
-		with open(ramfile,'r') as f: data = f.read()
-	except: data = ''
+		with open(ramfile,'r') as f: csv = f.read()
+	except: csv = ''
 
-	if data:
-		if not_valid_csv(data):
+	if csv:
+		data = get_data(csv)
+		html_elm = get_element(data)
+
+		if not_valid_csv(csv):
 			html_msg = '<font style="padding-left: 42px;" color="red">Neplatné CSV.</font>'
-		elif 'e1' and 'e2' in form.keys():
-			html_msg +=('<img src="data:image/jpeg;base64,'
-				+ base64.b64encode(regress(data.decode('utf-8'),form['e1'].value,form['e2'].value))
-				+ '">')
+		else:
+			data = get_data(csv)
+			html_elm = get_element(data)		
+			if 'e1' and 'e2' in form.keys():
+				html_msg +=('<img src="data:image/jpeg;base64,'
+					+ base64.b64encode(regress(data, form['e1'].value, form['e2'].value))
+					+ '">')
 
 	response_headers = [
 		('Content-type', 'text/html'),
-		('Content-Length',str(len(html_head + html_msg + html_foot)))
+		('Content-Length',str(len(html_head + html_elm + html_body + html_msg + html_foot)))
 	]
 	start_response(status, response_headers)
-	return [html_head + html_msg + html_foot]
+	return [html_head + html_elm + html_body + html_msg + html_foot]
 
