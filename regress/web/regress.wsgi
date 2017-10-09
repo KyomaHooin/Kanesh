@@ -85,8 +85,6 @@ def regress(data,el1,el2):
 
 	plot_buff = StringIO.StringIO()
 	tablet = get_tablet(data)
-	
-	if not data: return '<b>No data.</b>'
 
 	set1 = [float(x) for x in get_edata(el1,tablet,data)]
 	set2 = [float(x) for x in get_edata(el2,tablet,data)]
