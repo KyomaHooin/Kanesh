@@ -72,14 +72,14 @@ def get_edata(e,t,d):
 	for tab in t:
 		for i in range(0,len(d)):
 			if d[i][0] == tab and d[i][1] == e:
-				ed += d[i][2:]
+				ed += filter(None,d[i][2:])
 	return ed
 
 def get_tdata(e,t,d):
 	et = []
 	for i in range(0,len(d)):
 		if d[i][0] == t and d[i][1] == e:
-			return d[i][2:]
+			return filter(None,d[i][2:])
 
 def regress(data,el1,el2):
 
