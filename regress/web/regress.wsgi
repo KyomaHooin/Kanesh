@@ -42,8 +42,8 @@ ramfile = '/var/www/regress/ram/data'
 def not_valid_csv(d):
 	try:
 		for line in d.splitlines()[1:]:
-			if len(line.split(';')) < 4: return 0
-	except: return 0
+			if len(line.split(';')) < 4: return 1
+	except: return 1
 
 def get_data(d):
 	dt = []
@@ -161,9 +161,6 @@ def application(environ, start_response):
 	except: csv = ''
 
 	if csv:
-		data = get_data(csv)
-		html_elm = get_element(data)
-
 		if not_valid_csv(csv):
 			html_msg = '<font style="padding-left: 42px;" color="red">Neplatné CSV.</font>'
 		else:
