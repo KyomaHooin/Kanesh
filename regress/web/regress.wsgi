@@ -87,11 +87,11 @@ def get_c_plot(d,c,c1,c2):
 	set1 = [float(x) for x in get_edata(c1,tab,d)]
 	set2 = [float(y) for y in get_edata(c2,tab,d)]
 
-	slope, intercept, r_value, p_value, std_err = stats.linregress(set1,set2)
-
 	coef = round(stats.pearsonr(set1,set2)[0],2)
 
 	if abs(coef) >= float(c):
+		slope, intercept, r_value, p_value, std_err = stats.linregress(set1,set2)
+	
 		pyplot.subplots(figsize=(3,3), facecolor='white')
 
 		for t in tab:
@@ -102,7 +102,7 @@ def get_c_plot(d,c,c1,c2):
 				numpy.array(t_set1),
 				numpy.array(t_set2),
 				'o',
-				markeredgewidth=1.5,
+				markeredgewidth=1,
 				markeredgecolor='black',
 				markerfacecolor=clr[list(tab).index(t)],
 			)
@@ -111,13 +111,13 @@ def get_c_plot(d,c,c1,c2):
 			numpy.array(set1),
 			intercept + slope*numpy.array(set1),
 			'black',
-			linewidth=1.5
+			linewidth=1
 		)
 
 		pyplot.xlabel(c1,fontsize=13)
 		pyplot.ylabel(c2,fontsize=13)
 		pyplot.grid(True)
-		pyplot.title(coef, fontsize=20)
+		pyplot.title(coef, fontsize=17)
 		pyplot.subplots_adjust(bottom=0.2,left=0.2)
 		pyplot.savefig(filename=plot_buff, format='jpg',bbox_inches='tight')
 		pyplot.close()
