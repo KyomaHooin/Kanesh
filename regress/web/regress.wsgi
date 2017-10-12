@@ -7,6 +7,7 @@ matplotlib.use('Agg')# no display
 
 from scipy import stats
 from matplotlib import pyplot
+from itertools import combinations
 
 #---------------------------
 
@@ -17,7 +18,8 @@ html_head = """
 <img src="/media/python-powered.png">
 <br><p style="padding-left: 42px;">[ Formát CSV: <b>tablet;element;value;value;..</b> ]</p>
 <form style="padding-left: 42px;" enctype="multipart/form-data" action="regress" method="post">
-<b>Soubor CSV</b>: <input style="background-color:#ddd;" type="file" name="file"><br><br>
+<b>Soubor CSV</b>: <input style="background-color:#ddd;" type="file" name="file">
+<input style="width:7em;" placeholder="min. coef." type="number" name="coef" step="0.1" min="0" max="1"><br><br>
 """
 
 html_body= """
@@ -57,15 +59,8 @@ def get_tablet(d):
 
 def get_element(d):
 	e = []
-	s = '<table>'
-	for el in range(0,len(d)): e.append(d[el][1])
-	for elm in numpy.unique(e): s +=('<tr><td><input type="radio" name="e1" value="'
-			+ elm + '"></td><td>'
-			+ elm + '</td><td><input type="radio" name="e2" value="'
-			+ elm + '"></td><td>'
-			+ elm + '</td></tr>')
-	s += '</table><br>'
-	return s
+	for i in range(0,len(d)): e.append(d[i][1])
+	return numpy.unique(e)
 
 def get_edata(e,t,d):
 	ed = []
@@ -81,6 +76,59 @@ def get_tdata(e,t,d):
 		if d[i][0] == t and d[i][1] == e:
 			return filter(None,d[i][2:])
 
+def get_break(l):
+	for i in range(1,int(numpy.sqrt(l))+2):
+		if i ** 2 >= l: return i
+
+def get_c_plot(d,c,c1,c2):
+	plot_buff = StringIO.StringIO()
+	tab= get_tablet(d)
+
+	set1 = [float(x) for x in get_edata(c1,tab,d)]
+	set2 = [float(y) for y in get_edata(c2,tab,d)]
+
+	slope, intercept, r_value, p_value, std_err = stats.linregress(set1,set2)
+
+	coef = round(stats.pearsonr(set1,set2)[0],2)
+
+	if abs(coef) >= float(c):
+		pyplot.subplots(figsize=(3,3), facecolor='white')
+
+		for t in tab:
+			t_set1 = [float(x) for x in get_tdata(c1,t,d)]
+			t_set2 = [float(x) for x in get_tdata(c2,t,d)]
+			
+			pyplot.plot(
+				numpy.array(t_set1),
+				numpy.array(t_set2),
+				'o',
+				markeredgewidth=1.5,
+				markeredgecolor='black',
+				markerfacecolor=clr[list(tab).index(t)],
+			)
+
+		pyplot.plot(
+			numpy.array(set1),
+			intercept + slope*numpy.array(set1),
+			'black',
+			linewidth=1.5
+		)
+
+		pyplot.xlabel(c1,fontsize=13)
+		pyplot.ylabel(c2,fontsize=13)
+		pyplot.grid(True)
+		pyplot.title(coef, fontsize=20)
+		pyplot.subplots_adjust(bottom=0.2,left=0.2)
+		pyplot.savefig(filename=plot_buff, format='jpg',bbox_inches='tight')
+		pyplot.close()
+
+		plot_buff.seek(0)
+		out = plot_buff.getvalue()
+		plot_buff.close()
+		
+		return base64.b64encode(out)
+	return ''
+	
 def regress(data,el1,el2):
 
 	plot_buff = StringIO.StringIO()
@@ -106,7 +154,6 @@ def regress(data,el1,el2):
 			markeredgewidth=1.5,
 			markeredgecolor='black',
 			markerfacecolor=clr[list(tablet).index(t)],
-	#		markersize='7',
 			label=t
 		)
 
@@ -124,6 +171,7 @@ def regress(data,el1,el2):
 	pyplot.subplots_adjust( left=0.1,right=0.8)
 	pyplot.legend(frameon=False, numpoints=1, loc='center left',handletextpad=0, bbox_to_anchor=(1,0.5))
 	pyplot.savefig(filename=plot_buff, format='jpg')
+	pyplot.close()
 
 	plot_buff.seek(0)
 	out = plot_buff.getvalue()
@@ -159,14 +207,35 @@ def application(environ, start_response):
 	try:
 		with open(ramfile,'r') as f: csv = f.read()
 	except: csv = ''
+	
+	if 'coef' in form.keys(): coef = form['coef'].value
+	else: coef = ''
 
 	if csv:
 		if not_valid_csv(csv):
 			html_msg = '<font style="padding-left: 42px;" color="red">Neplatné CSV.</font>'
 		else:
 			data = get_data(csv)
-			html_elm = get_element(data)		
-			if 'e1' and 'e2' in form.keys():
+			element = get_element(data)
+			if not coef:
+				html_elm = '<table>'
+				for e in element:
+					html_elm+= ('<tr><td><input type="radio" name="e1" value="'
+						+ e + '"></td><td>'
+						+ e + '</td><td><input type="radio" name="e2" value="'
+						+ e + '"></td><td>'
+						+ e + '</td></tr>')
+				html_elm += '</table><br>'
+			if coef:
+				c_all = []
+				for c in combinations(element,2):
+					cp = get_c_plot(data,coef,c[0],c[1])
+					if cp: c_all.append(cp)
+				brk  = get_break(len(c_all))
+				for j in range(0,len(c_all)):
+					html_msg +=('<img src="data:image/jpeg;base64,' + c_all[j] + '">')
+					if (j + 1) % brk == 0: html_msg += '<br>'
+			elif 'e1' and 'e2' in form.keys():
 				html_msg +=('<img src="data:image/jpeg;base64,'
 					+ base64.b64encode(regress(data, form['e1'].value, form['e2'].value))
 					+ '">')
