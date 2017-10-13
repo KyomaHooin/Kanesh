@@ -3,7 +3,7 @@
 # Preformated CSV from XLS data
 #
 
-import sys,os,re
+import subprocess,sys,os,re
 
 try: import xlrd
 except:
@@ -12,8 +12,9 @@ except:
 
 #--------
 
-SRC = '/path/to/xls/doc/'
-SPFILE = 'spectra.txt'
+SRC = '/xls/src/dir/'
+SPORIG = '/orig/spectra/full/path'
+SPFILE = '/source/spectra/full/path'
 SPECTRA= {}
 
 #--------
@@ -40,3 +41,14 @@ with open(SPFILE,'w') as f:
 	for j in SPECTRA:
 		f.write(SPECTRA[j])
 
+try: diff = subprocess.check_output(['diff', SPFILE, SPORIG])
+except: pass
+
+if diff: print diff
+else: print "diff: Files match."
+
+move = raw_input("Update spetra.txt file:[y/n]: ")
+
+if move == 'y':
+	os.rename(SPFILE, SPORIG)
+	print "Done."
