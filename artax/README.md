@@ -13,7 +13,8 @@ FILE
    ArtaxHelper.au3 - Helper functions.
    ArtaxRename.au3 - Repair export name by map.
      ArtaxCalc.au3 - Calculate mean/standard deviation from CSV data.
-       spectra.txt - Tablet to spectra map.
+     spectragen.py - Tablet to ID CSV mapping generator.
+       spectra.txt - Tablet to spectra ID map.
 _XMLDomWrapper.au3 - XML library by Stephen Podhajecki.
          artax.ico - Program icon. 
   artax_screen.png - Screenshot.
