@@ -13,8 +13,8 @@ except:
 #--------
 
 SRC = '/xls/src/dir/'
-SPORIG = '/orig/spectra/full/path'
-SPFILE = '/source/spectra/full/path'
+SPORIG = '/orig/spectra/full/path/name'
+SPFILE = '/source/spectra/full/path/name'
 SPECTRA= {}
 
 #--------
@@ -41,14 +41,14 @@ with open(SPFILE,'w') as f:
 	for j in SPECTRA:
 		f.write(SPECTRA[j])
 
-try: diff = subprocess.check_output(['diff', SPFILE, SPORIG])
-except: pass
+try:
+	subprocess.check_output(['diff', SPFILE, SPORIG], stderr=subprocess.STDOUT)
+except subprocess.CalledProcessError as e:
+	print e.output
 
-if diff: print diff
-else: print "diff: Files match."
-
-move = raw_input("Update spetra.txt file:[y/n]: ")
+move = raw_input("Update spectra.txt file:[y/n]: ")
 
 if move == 'y':
 	os.rename(SPFILE, SPORIG)
 	print "Done."
+
