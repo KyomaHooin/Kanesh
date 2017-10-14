@@ -6,9 +6,9 @@ Bruker Artax 400 uXRF spectrometer software.
 FILE
 
 <pre>
-   ArtaxExport/ -  Artax export wapper.
-   ArtaxRename/ -  Rename Artax SPX/Export ID.  
-     ArtaxCalc/ -  Mean, Deviation from export data.
+    ArtaxExport/ -  Artax export wapper.
+    ArtaxRename/ -  Rename Artax SPX/Export ID.  
+      ArtaxCalc/ -  Mean, Deviation from export data.
 
 Artax_manual.odt - Program I/O manual.
 Artax_manual.pdf - Program I/O manual.
