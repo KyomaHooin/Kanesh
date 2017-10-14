@@ -2,14 +2,14 @@
 
 DESCRIPTION
 
-Rename Bruker Artax 400 uXRF spectra or export file data ID.
+Rename Bruker Artax 400 uXRF project or export file data ID.
 
 FILE
 
 <pre>
    ArtaxRename.au3 - Main program.
 _XMLDomWrapper.au3 - XML library by Stephen Podhajecki.
-  rename_screen.png - Screenshot.
+ rename_screen.png - Screenshot.
          artax.ico - Program icon. 
 </pre>
 
