@@ -31,24 +31,14 @@ def get_edata(e,tab):
 	for t in tab:
 		for i in range(0,len(data)):
 			if data[i][0] == t and data[i][1] == e:
-				ed += data[i][2:]
+				ed += filter(None,data[i][2:])
 	return ed
 
 def get_tdata(e,tab):
 	et = []
 	for i in range(0,len(data)):
 		if data[i][0] == tab and data[i][1] == e:
-				return data[i][2:]
-
-#--------------------------------
-
-f = open('input.csv','r')
-
-data = csv_read(f)
-
-f.close()
-
-tablet = get_tablet()
+				return filter(None,data[i][2:])
 
 def plot_all(c):
 
@@ -92,5 +82,16 @@ def plot_all(c):
 	plt.savefig(filename='regress_'+ c[0] + '_' + c[1] + '.png', format='png', dpi=300)
 	plt.close()
 
+#--------------------------------
+
+f = open('input2.csv','r')
+
+data = csv_read(f)
+
+f.close()
+
+tablet = get_tablet()
+
 for i in combinations(element,2):
 	plot_all(i)
+
