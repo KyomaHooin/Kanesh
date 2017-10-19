@@ -227,19 +227,24 @@ def application(environ, start_response):
 						+ e + '</td></tr>')
 				html_elm += '</table><br>'
 			if coef:
-				c_all = []
-				for c in combinations(element,2):
-					cp = get_c_plot(data,coef,c[0],c[1])
-					if cp: c_all.append(cp)
-				brk  = get_break(len(c_all))
-				for j in range(0,len(c_all)):
-					html_msg +=('<img src="data:image/jpeg;base64,' + c_all[j] + '">')
-					if (j + 1) % brk == 0: html_msg += '<br>'
+				try:
+					c_all = []
+					for c in combinations(element,2):
+						cp = get_c_plot(data,coef,c[0],c[1])
+						if cp: c_all.append(cp)
+					brk  = get_break(len(c_all))
+					for j in range(0,len(c_all)):
+						html_msg +=('<img src="data:image/jpeg;base64,' + c_all[j] + '">')
+						if (j + 1) % brk == 0: html_msg += '<br>'
+				except:
+					html_msg = '<font style="padding-left: 42px;" color="red">Chyba při generování grafu.</font>'
 			elif 'e1' and 'e2' in form.keys():
-				html_msg +=('<img src="data:image/jpeg;base64,'
-					+ base64.b64encode(regress(data, form['e1'].value, form['e2'].value))
-					+ '">')
-
+				try:
+					html_msg +=('<img src="data:image/jpeg;base64,'
+						+ base64.b64encode(regress(data, form['e1'].value, form['e2'].value))
+						+ '">')
+				except:
+					html_msg = '<font style="padding-left: 42px;" color="red">Chyba při generování grafu.</font>'
 	response_headers = [
 		('Content-type', 'text/html'),
 		('Content-Length',str(len(html_head + html_elm + html_body + html_msg + html_foot)))
