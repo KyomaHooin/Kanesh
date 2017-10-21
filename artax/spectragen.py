@@ -19,6 +19,10 @@ SPECTRA= {}
 
 #--------
 
+print "\nFILE:", SPFILE
+print "ORIG:", SPORIG
+print "\nGenerating mapping.."
+
 for xls in os.listdir(SRC):
 	if 'xls' in xls:
 		try:
@@ -37,18 +41,25 @@ SPECTRA.pop(722)
 SPECTRA.pop(775)
 SPECTRA.pop(776)
 
+print "Done."
+
 with open(SPFILE,'w') as f:
 	for j in SPECTRA:
 		f.write(SPECTRA[j])
-
 try:
 	subprocess.check_output(['diff', SPFILE, SPORIG], stderr=subprocess.STDOUT)
 except subprocess.CalledProcessError as e:
 	print e.output
 
-move = raw_input("Update spectra.txt file:[y/n]: ")
+move = raw_input("\nUpdate target file? [y/n]: ")
 
 if move == 'y':
 	os.rename(SPFILE, SPORIG)
-	print "Done."
+
+drop = raw_input("Remove source file? [y/n]: ")
+
+if drop == 'y':
+	os.remove(SPFILE)
+
+print "Done."
 
