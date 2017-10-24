@@ -18,8 +18,7 @@ html_head = """
 <img src="/media/python-powered.png">
 <br><p style="padding-left: 42px;">[ Formát CSV: <b>tablet;element;value;value;..</b> ]</p>
 <form style="padding-left: 42px;" enctype="multipart/form-data" action="regress" method="post">
-<b>Soubor CSV</b>: <input style="background-color:#ddd;" type="file" name="file">
-<input style="width:7em;" placeholder="min. coef." type="number" name="coef" step="0.1" min="0" max="1"><br><br>
+<b>Soubor CSV</b>: <input style="background-color:#ddd;" type="file" name="file"><br><br>
 """
 
 html_body= """
@@ -80,7 +79,16 @@ def get_break(l):
 	for i in range(1,int(numpy.sqrt(l))+2):
 		if i ** 2 >= l: return i
 
-def get_c_plot(d,c,c1,c2):
+def get_combinations(e,ex):
+	e = e.tolist()
+	try:
+		for exc in iter(ex):
+			e.remove(exc.value)
+	except:
+		e.remove(ex.value)
+	return e
+
+def get_c_plot(d,tex,cmin,cmax,c1,c2):
 	plot_buff = StringIO.StringIO()
 	tab= get_tablet(d)
 
@@ -89,7 +97,10 @@ def get_c_plot(d,c,c1,c2):
 
 	coef = round(stats.pearsonr(set1,set2)[0],2)
 
-	if abs(coef) >= float(c):
+	if not cmin: cmin = 0
+	if not cmax: cmax = 1
+
+	if float(cmax) >= abs(coef) >= float(cmin):
 		slope, intercept, r_value, p_value, std_err = stats.linregress(set1,set2)
 	
 		pyplot.subplots(figsize=(3,3), facecolor='white')
@@ -129,7 +140,7 @@ def get_c_plot(d,c,c1,c2):
 		return base64.b64encode(out)
 	return ''
 	
-def regress(data,el1,el2):
+def regress(data,tex,el1,el2):
 
 	plot_buff = StringIO.StringIO()
 	tablet = get_tablet(data)
@@ -208,8 +219,14 @@ def application(environ, start_response):
 		with open(ramfile,'r') as f: csv = f.read()
 	except: csv = ''
 	
-	if 'coef' in form.keys(): coef = form['coef'].value
-	else: coef = ''
+	if 'coefmin' in form.keys(): coefmin = form['coefmin'].value
+	else: coefmin = ''
+	if 'coefmax' in form.keys(): coefmax = form['coefmax'].value
+	else: coefmax = ''
+	if 'exc' in form.keys(): exc = form['exc']
+	else: exc = ''
+	if 'tex' in form.keys(): tex = form['tex']
+	else: tex = ''
 
 	if csv:
 		if not_valid_csv(csv):
@@ -217,31 +234,54 @@ def application(environ, start_response):
 		else:
 			data = get_data(csv)
 			element = get_element(data)
-			if not coef:
-				html_elm = '<table>'
-				for e in element:
-					html_elm+= ('<tr><td><input type="radio" name="e1" value="'
-						+ e + '"></td><td>'
-						+ e + '</td><td><input type="radio" name="e2" value="'
-						+ e + '"></td><td>'
-						+ e + '</td></tr>')
-				html_elm += '</table><br>'
-			if coef:
-				try:
-					c_all = []
-					for c in combinations(element,2):
-						cp = get_c_plot(data,coef,c[0],c[1])
-						if cp: c_all.append(cp)
-					brk  = get_break(len(c_all))
-					for j in range(0,len(c_all)):
-						html_msg +=('<img src="data:image/jpeg;base64,' + c_all[j] + '">')
-						if (j + 1) % brk == 0: html_msg += '<br>'
-				except:
-					html_msg = '<font style="padding-left: 42px;" color="red">Chyba při generování grafu.</font>'
+			tablet = get_tablet(data)
+			html_elm = '<table><tr><td><table>'
+			for e in element:
+				html_elm+= ('<tr><td><input type="radio" name="e1" value="'
+					+ e + '"></td><td>'
+					+ e + '</td><td><input type="radio" name="e2" value="'
+					+ e + '"></td><td>'
+					+ e + '</td><tr>')
+			html_elm +='</table></td><td valign="top"><table>'
+			for e in element:
+				html_elm+= ('<tr><td>&nbsp&nbsp&nbsp</td>'
+					+ '<td><input type="checkbox" name="exc" value="'
+					+ e + '"></td><td>'
+					+ e + '</td></tr>')
+			html_elm +='</table></td><td valign="top"><table>'
+			for t in tablet:
+				html_elm+= ('<tr><td>&nbsp&nbsp&nbsp</td>'
+					+ '<td><input type="checkbox" name="tex" value="'
+					+ t + '"></td><td>'
+					+ t + '</td><tr>')
+			html_elm +='</table></td><td valign="top"><table>'
+			html_elm += ('<tr><td>&nbsp&nbsp&nbsp</td>'
+				+ '<td><input style="width:7em;" placeholder="min. coef." type="number"'
+				+ ' name="coefmin" step="0.1" min="0" max="1"></td></tr>'
+				+ '<tr><td>&nbsp&nbsp&nbsp</td>'
+				+ '<td><input style="width:7em;" placeholder="max. coef." type="number"'
+				+ ' name="coefmax" step="0.1" min="0" max="1"></td></tr>')
+			html_elm += '</table></td></tr></table><br>'
+			if coefmin or coefmax:
+				if coefmin and coefmax and coefmin > coefmax:
+					html_msg = '<font style="padding-left: 42px;" color="red">Neplatné nastavení koeficientů.</font>'
+				else:
+					c_list = get_combinations(element,exc)
+					try:
+						c_all = []
+						for c in combinations(c_list,2):
+							cp = get_c_plot(data,tex,coefmin,coefmax,c[0],c[1])
+							if cp: c_all.append(cp)
+						brk  = get_break(len(c_all))
+						for j in range(0,len(c_all)):
+							html_msg +=('<img src="data:image/jpeg;base64,' + c_all[j] + '">')
+							if (j + 1) % brk == 0: html_msg += '<br>'
+					except:
+						html_msg = '<font style="padding-left: 42px;" color="red">Chyba při generování grafu.</font>'
 			elif 'e1' and 'e2' in form.keys():
 				try:
 					html_msg +=('<img src="data:image/jpeg;base64,'
-						+ base64.b64encode(regress(data, form['e1'].value, form['e2'].value))
+						+ base64.b64encode(regress(data,tex,form['e1'].value,form['e2'].value))
 						+ '">')
 				except:
 					html_msg = '<font style="padding-left: 42px;" color="red">Chyba při generování grafu.</font>'
