@@ -59,8 +59,7 @@ def get_tablet(d):
 def get_tablet_ex(tab,tex):
 	t = tab.tolist()
 	try:
-		for tx in iter(tex):
-			t.remove(tx.value)
+		for tx in tex: t.remove(tx.value)
 	except:
 		t.remove(tex.value)
 	return numpy.array(t)
@@ -91,8 +90,7 @@ def get_break(l):
 def get_combinations(e,ex):
 	e = e.tolist()
 	try:
-		for exc in iter(ex):
-			e.remove(exc.value)
+		for exc in ex: e.remove(exc.value)
 	except:
 		e.remove(ex.value)
 	return e
