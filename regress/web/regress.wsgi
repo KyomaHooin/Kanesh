@@ -56,6 +56,15 @@ def get_tablet(d):
 	for i in range(0,len(d)): t.append(d[i][0])
 	return numpy.unique(t)
 
+def get_tablet_ex(tab,tex):
+	t = tab.tolist()
+	try:
+		for tx in iter(tex):
+			t.remove(tx.value)
+	except:
+		t.remove(tex.value)
+	return numpy.array(t)
+
 def get_element(d):
 	e = []
 	for i in range(0,len(d)): e.append(d[i][1])
@@ -88,12 +97,12 @@ def get_combinations(e,ex):
 		e.remove(ex.value)
 	return e
 
-def get_c_plot(d,tex,cmin,cmax,c1,c2):
+def get_c_plot(d,tab,tex,cmin,cmax,c1,c2):
 	plot_buff = StringIO.StringIO()
-	tab= get_tablet(d)
+	tablet = get_tablet_ex(tab,tex)
 
-	set1 = [float(x) for x in get_edata(c1,tab,d)]
-	set2 = [float(y) for y in get_edata(c2,tab,d)]
+	set1 = [float(x) for x in get_edata(c1,tablet,d)]
+	set2 = [float(y) for y in get_edata(c2,tablet,d)]
 
 	coef = round(stats.pearsonr(set1,set2)[0],2)
 
@@ -105,7 +114,7 @@ def get_c_plot(d,tex,cmin,cmax,c1,c2):
 	
 		pyplot.subplots(figsize=(3,3), facecolor='white')
 
-		for t in tab:
+		for t in tablet:
 			t_set1 = [float(x) for x in get_tdata(c1,t,d)]
 			t_set2 = [float(x) for x in get_tdata(c2,t,d)]
 			
@@ -115,7 +124,7 @@ def get_c_plot(d,tex,cmin,cmax,c1,c2):
 				'o',
 				markeredgewidth=1,
 				markeredgecolor='black',
-				markerfacecolor=clr[list(tab).index(t)],
+				markerfacecolor=clr[list(tablet).index(t)],
 			)
 
 		pyplot.plot(
@@ -140,10 +149,10 @@ def get_c_plot(d,tex,cmin,cmax,c1,c2):
 		return base64.b64encode(out)
 	return ''
 	
-def regress(data,tex,el1,el2):
+def regress(data,tab,tex,el1,el2):
 
 	plot_buff = StringIO.StringIO()
-	tablet = get_tablet(data)
+	tablet = get_tablet_ex(tab,tex)
 
 	set1 = [float(x) for x in get_edata(el1,tablet,data)]
 	set2 = [float(x) for x in get_edata(el2,tablet,data)]
@@ -266,11 +275,10 @@ def application(environ, start_response):
 				if coefmin and coefmax and coefmin > coefmax:
 					html_msg = '<font style="padding-left: 42px;" color="red">Neplatné nastavení koeficientů.</font>'
 				else:
-					c_list = get_combinations(element,exc)
 					try:
 						c_all = []
-						for c in combinations(c_list,2):
-							cp = get_c_plot(data,tex,coefmin,coefmax,c[0],c[1])
+						for c in combinations(get_combinations(element,exc),2):
+							cp = get_c_plot(data,tablet,tex,coefmin,coefmax,c[0],c[1])
 							if cp: c_all.append(cp)
 						brk  = get_break(len(c_all))
 						for j in range(0,len(c_all)):
@@ -281,7 +289,7 @@ def application(environ, start_response):
 			elif 'e1' and 'e2' in form.keys():
 				try:
 					html_msg +=('<img src="data:image/jpeg;base64,'
-						+ base64.b64encode(regress(data,tex,form['e1'].value,form['e2'].value))
+						+ base64.b64encode(regress(data,tablet,tex,form['e1'].value,form['e2'].value))
 						+ '">')
 				except:
 					html_msg = '<font style="padding-left: 42px;" color="red">Chyba při generování grafu.</font>'
