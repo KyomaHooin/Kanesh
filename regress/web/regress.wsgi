@@ -42,7 +42,7 @@ ramfile = '/var/www/regress/ram/data'
 
 def not_valid_csv(d):
 	try:
-		for line in d.splitlines()[1:]:
+		for line in d.splitlines():
 			if len(line.split(';')) < 4: return 1
 	except: return 1
 
@@ -57,12 +57,12 @@ def get_tablet(d):
 	return numpy.unique(t)
 
 def get_tablet_ex(tab,tex):
-	t = tab.tolist()
+	tab = tab.tolist()
 	try:
-		for tx in tex: t.remove(tx.value)
+		for tx in tex: tab.remove(tx.value)
 	except:
-		t.remove(tex.value)
-	return numpy.array(t)
+		tab.remove(tex.value)
+	return numpy.array(tab)
 
 def get_element(d):
 	e = []
