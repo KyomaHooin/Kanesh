@@ -12,9 +12,9 @@ except:
 
 #--------
 
-SRC = '/xls/src/dir/'
-SPORIG = '/orig/spectra/full/path/name'
-SPFILE = '/source/spectra/full/path/name'
+SRC = '/home/user/Desktop/PROJEKT/PROJEKT/artax/dokumenty/'
+SPORIG = '/home/user/Desktop/PROJEKT/PROJEKT/artax/program/spectra.txt'
+SPFILE = '/home/user/Desktop/spectra.txt'
 SPECTRA= {}
 
 #--------
@@ -55,11 +55,10 @@ move = raw_input("\nUpdate target file? [y/n]: ")
 
 if move == 'y':
 	os.rename(SPFILE, SPORIG)
-
-drop = raw_input("Remove source file? [y/n]: ")
-
-if drop == 'y':
-	os.remove(SPFILE)
+else:
+	drop = raw_input("Remove source file? [y/n]: ")
+	if drop == 'y':
+		os.remove(SPFILE)
 
 print "Done."
 
