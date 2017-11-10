@@ -51,7 +51,7 @@ try:
 except subprocess.CalledProcessError as e:
 	print e.output
 
-move = raw_input("\nUpdate target file? [y/n]: ")
+move = raw_input("Update target file? [y/n]: ")
 
 if move == 'y':
 	os.rename(SPFILE, SPORIG)
