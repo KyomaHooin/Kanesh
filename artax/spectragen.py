@@ -15,7 +15,7 @@ except:
 SRC = '/home/user/Desktop/PROJEKT/PROJEKT/artax/dokumenty/'
 SPORIG = '/home/user/Desktop/PROJEKT/PROJEKT/artax/program/spectra.txt'
 SPFILE = '/home/user/Desktop/spectra.txt'
-SPECTRA= {}
+SPECTRA = {}
 
 #--------
 
