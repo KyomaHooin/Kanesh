@@ -22,7 +22,7 @@ tmpfs	/var/www/regress/ram	tmpfs	nodev,nosuid,size=2M	0	0
     Allow from all
 &lt;/Directory&gt;
 
-WSGIScriptAlias /color /var/www/regress/regress.wsgi
+WSGIScriptAlias /regress /var/www/regress/regress.wsgi
 WSGIApplicationGroup %{GLOBAL}
 </pre>
 INPUT
