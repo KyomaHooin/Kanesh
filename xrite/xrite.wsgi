@@ -33,6 +33,7 @@ def is_valid_csv(data):
 
 def parse_csv(f,p):
 	lst = []
+	std = ''
 	try:
 		for ln in f.splitlines()[10:]:# skip header
 			line = ln.split(',')
@@ -83,7 +84,7 @@ def application(environ, start_response):
 			response_headers = [
 				('Content-type','application/octet-stream'),
 				('Content-Length', str(payload.len)),
-				('Content-Disposition', 'attachment; filename=xrite_'+time.strftime("%Y%m%d_%H%M%S")+'.csv')
+				('Content-Disposition', 'attachment; filename=xrite_' + time.strftime("%Y%m%d_%H%M%S") + '.csv')
 			]
 			start_response(status, response_headers)
 			return environ['wsgi.file_wrapper'](payload, 1024)
