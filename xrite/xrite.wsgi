@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import StringIO,time,cgi
+import StringIO,time,cgi,re
 
 #---------------------------
 
@@ -32,7 +32,7 @@ def is_valid_csv(data):
 	return 1
 
 def parse_csv(f,p):
-	lst = []
+	lst,lstx = [],[]
 	std = ''
 	try:
 		for ln in f.splitlines()[10:]:# skip header
@@ -40,10 +40,14 @@ def parse_csv(f,p):
 			if line[0] == 'STANDARD': # catch standard
 				std = line[1]
 			elif line[0]: # non-empty
-				lst.append(line[1] + ';' + std + ';' + ';'.join(line[17:23]) + '\n')
+				if re.match('^[a-zA-Z]\d+$',line[1]):
+					lst.append(line[1] + ';' + std + ';' + ';'.join(line[17:23]) + '\n')
+				else:
+					lstx.append(line[1] + ';' + std + ';' + ';'.join(line[17:23]) + '\n')
 		lst.sort(key = lambda x: ( x.split(';')[0][0], int(x.split(';')[0][1:]) ))# hard sort
 		lst.insert(0,'sep=;\n') # separator
-		for i in lst:
+		lstx.sort()
+		for i in lst + lstx:
 			p.write(i)
 		return p
 	except:
