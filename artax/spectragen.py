@@ -56,9 +56,7 @@ move = raw_input("Update target file? [y/n]: ")
 if move == 'y':
 	os.rename(SPFILE, SPORIG)
 else:
-	drop = raw_input("Remove source file? [y/n]: ")
-	if drop == 'y':
-		os.remove(SPFILE)
+	os.remove(SPFILE)
 
 print "Done."
 
