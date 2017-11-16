@@ -41,7 +41,7 @@ def parse_csv(f,p):
 			elif line[0]: # non-empty
 				lst.append(line[1] + ';' + std + ';' + ';'.join(line[17:23]) + '\n')
 		lst.sort(key = lambda x: ( x.split(';')[0][0], int(x.split(';')[0][1:]) ))# hard sort
-		lst.insert(0,'sep;\n') # separator
+		lst.insert(0,'sep=;\n') # separator
 		for i in lst:
 			p.write(i)
 		return p
