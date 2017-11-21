@@ -22,6 +22,8 @@ html_foot = """
 </html>
 """
 
+alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
 status = '200 OK'
 
 #---------------------------
@@ -32,8 +34,7 @@ def is_valid_csv(data):
 	return 1
 
 def parse_csv(f,p):
-	prev,nxt,avg = '','',[]
-	std,lst,lstx = [],[],[]
+	std,lst,lstx,avg = [],[],[],[]
 	try:
 		for ln in f.splitlines()[10:]:# skip header
 			line = ln.split(',')
@@ -53,25 +54,19 @@ def parse_csv(f,p):
 		lst.sort()# sort
 		lstx.sort()
 		p.write('sep=;\n')# sep.
-		for i in range(0,len(lst)):
-			nxt = lst[i][0]# update next
-			if prev and prev != nxt or i == len(lst)-1:# last or total
-				for j in range(i-len(avg),i):
-					p.write(lst[j][0] +
-						str(lst[j][1]) +
-						';' +
-						';'.join(map(str,lst[j][2:])) +
-						'\r\n'
-					)
-				p.write('AVG;;' 
-					+ str(round(sum(zip(*avg)[0])/len(avg),1)) + ';'
-					+ str(round(sum(zip(*avg)[1])/len(avg),1)) + ';'
-					+ str(round(sum(zip(*avg)[2])/len(avg),1))
-					+ '\r\n'
+		for a in alpha:
+			for i in lst:
+				if a == i[0]:
+					avg.append(i)# update avg
+			if len(avg) > 0:	
+				for j in avg:
+					p.write(j[0] + str(j[1]) + ';' + ';'.join(map(str,j[2:])) + '\r\n')
+				p.write('AVG;;'
+					+ str(round(sum(zip(*avg)[3])/len(avg),1)) + ';'
+					+ str(round(sum(zip(*avg)[4])/len(avg),1)) + ';'
+					+ str(round(sum(zip(*avg)[5])/len(avg),1)) + '\r\n'
 				)
-				avg = []# clear avg
-			avg.append((lst[i][3],lst[i][4],lst[i][5]))# update avg
-			prev = lst[i][0]# update prev
+			avg = []# clear avg
 		for j in lstx: p.write(j)
 		return p
 	except:
