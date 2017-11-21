@@ -61,7 +61,7 @@ def parse_csv(f,p):
 						str(lst[j][1]) +
 						';' +
 						';'.join(map(str,lst[j][2:])) +
-						'\n'
+						'\r\n'
 					)
 				p.write('AVG;;' 
 					+ str(round(sum(zip(*avg)[0])/len(avg),1)) + ';'
