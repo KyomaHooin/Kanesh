@@ -34,12 +34,12 @@ def is_valid_csv(data):
 	return 1
 
 def parse_csv(f,p):
-	std,lst,lstx,avg = [],[],[],[]
+	std,lst,avg = [],[],[]
 	try:
 		for ln in f.splitlines()[10:]:# skip header
 			line = ln.split(',')
 			if line[0] == 'STANDARD': # catch standard
-				std = [line[1],float(line[5]),float(line[6]),float(line[7])]
+				std = [line[1],float(line[5]),float(line[6]),float(line[7]),float(line[8]),float(line[9])]
 			elif line[0]: # non-empty
 				if re.match('^[A-Z]\d+$',line[1]):
 					lst.append((line[1][0],
@@ -47,27 +47,42 @@ def parse_csv(f,p):
 						std[0],
 						float(line[17]) + std[1],
 						float(line[18]) + std[2],
-						float(line[19]) + std[3]
+						float(line[19]) + std[3],
+						float(line[20]) + std[4],
+						float(line[21]) + std[5],
+						float(line[17]),
+						float(line[18]),
+						float(line[19]),
+						float(line[20]),
+						float(line[21])
 					))
-				else:
-					lstx.append(line[1] + ';' + std[0] + ';' + ';'.join(line[17:20]) + '\r\n')
 		lst.sort()# sort
-		lstx.sort()
-		p.write('sep=;\n')# sep.
+		p.write('sep=;\r\n')# sep.
+		p.write('ID;STD;dL;da;db;dC;dH;;dL;da;db;dC;dH\r\n')# header
 		for a in alpha:
 			for i in lst:
 				if a == i[0]:
 					avg.append(i)# update avg
 			if len(avg) > 0:	
 				for j in avg:
-					p.write(j[0] + str(j[1]) + ';' + ';'.join(map(str,j[2:])) + '\r\n')
+					p.write(j[0] + str(j[1]) + ';' +
+						';'.join(map(str,j[2:8])) + ';;' +
+						';'.join(map(str,j[8:13])) + '\r\n'
+					)
 				p.write('AVG;;'
 					+ str(round(sum(zip(*avg)[3])/len(avg),1)) + ';'
 					+ str(round(sum(zip(*avg)[4])/len(avg),1)) + ';'
-					+ str(round(sum(zip(*avg)[5])/len(avg),1)) + '\r\n'
+					+ str(round(sum(zip(*avg)[5])/len(avg),1)) + ';'
+					+ str(round(sum(zip(*avg)[6])/len(avg),1)) + ';'
+					+ str(round(sum(zip(*avg)[7])/len(avg),1)) + ';;'
+					+ str(round(sum(zip(*avg)[8])/len(avg),1)) + ';'
+					+ str(round(sum(zip(*avg)[9])/len(avg),1)) + ';'
+					+ str(round(sum(zip(*avg)[10])/len(avg),1)) + ';'
+					+ str(round(sum(zip(*avg)[11])/len(avg),1)) + ';'
+					+ str(round(sum(zip(*avg)[12])/len(avg),1)) + '\r\n'
+					+ ';;;;;;;;;;;;\r\n'	
 				)
 			avg = []# clear avg
-		for j in lstx: p.write(j)
 		return p
 	except:
 		return '<font style="padding-left: 42px;" color="red">Chyba při zpracování dat.</font>'
