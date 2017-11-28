@@ -4,7 +4,7 @@ Parse X-Rite QC Report colorimetr CSV export data into preformated CSV.
 
 INSTALL
 <pre>
-apt-get install libapache2-mod-wsgi
+apt-get install python-openpyxl libapache2-mod-wsgi
 </pre>
 CONFIG
 <pre>
