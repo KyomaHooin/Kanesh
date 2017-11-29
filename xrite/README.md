@@ -1,6 +1,6 @@
 DESCRIPTION
 
-Parse X-Rite QC Report colorimetr CSV export data into preformated CSV.
+Parse X-Rite QC-Report colorimetr CSV data export into preformated XLSX.
 
 INSTALL
 <pre>
