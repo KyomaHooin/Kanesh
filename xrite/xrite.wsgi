@@ -26,7 +26,7 @@ html_foot = """
 
 alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-header = ['č. měření','název standardu','ΔL*','Δa*','Δb*','ΔC*','ΔH*']
+header = ['č. měření','název standardu','ΔL*','Δa*','Δb*','ΔC*','ΔH*','ΔE*']
 
 status = '200 OK'
 
@@ -64,16 +64,16 @@ def csv_to_xlsx(f,p):
 				std = line[1].title()
 			elif line[0]: # non-empty
 				if re.match('^[A-Z]\d+$',line[1]):# data
-					data.append([line[1][0]]+[int(line[1][1:])]+[std]+line[5:8]+line[17:22])
+					data.append([line[1][0]]+[int(line[1][1:])]+[std]+line[5:9]+line[17:23])
 		data.sort()
 		cell_data(sheet,header,coord)# header
-		cell_format(sheet,header,coord,'dd9d050')
+		cell_format(sheet,header,coord,'theme:4:0.39997558519241921')
 		coord+=1
 		for a in alpha:# data
 			for i in data:
 				if a == i[0]:
-					batch1.append([i[0]+str(i[1]),i[2]] + map(float,i[6:11]))# non-sum
-					batch2.append([i[0]+str(i[1]),i[2]] + map(float,i[3:6]) + ['',''])# sum
+					batch1.append([i[0]+str(i[1]),i[2]] + map(float,i[6:12]))# non-sum
+					batch2.append([i[0]+str(i[1]),i[2]] + map(float,i[3:7]) + ['',''])# sum
 			if len(batch1) > 0:
 				avg.append([
 					'','',
@@ -81,16 +81,17 @@ def csv_to_xlsx(f,p):
 					str(round(sum(zip(*batch1)[3])/len(batch1),1)),
 					str(round(sum(zip(*batch1)[4])/len(batch1),1)),
 					str(round(sum(zip(*batch1)[5])/len(batch1),1)),
-					str(round(sum(zip(*batch1)[6])/len(batch1),1))
+					str(round(sum(zip(*batch1)[6])/len(batch1),1)),
+					str(round(sum(zip(*batch1)[7])/len(batch1),1))
 				])
 				for b in batch1:
 					cell_data(sheet,b,coord)
-					cell_format(sheet,b,coord,'aaccccff')
+					cell_format(sheet,b,coord,'')
 					coord+=1
 				batch1 = []
 			if len(avg) > 0:
 				cell_data(sheet,avg[0],coord)
-				cell_format(sheet,avg[0],coord,'ffbb543')
+				cell_format(sheet,avg[0],coord,'theme:0:-0.34998626667073579')
 				coord+=1
 			if len(batch2) > 0:
 				avg.append([
@@ -98,16 +99,17 @@ def csv_to_xlsx(f,p):
 					str(round(sum(zip(*batch2)[2])/len(batch2),1)),
 					str(round(sum(zip(*batch2)[3])/len(batch2),1)),
 					str(round(sum(zip(*batch2)[4])/len(batch2),1)),
+					str(round(sum(zip(*batch2)[5])/len(batch2),1)),
 					'',''
 				])
 				for c in batch2:
 					cell_data(sheet,c,coord)
-					cell_format(sheet,c,coord,'ff92d050')
+					cell_format(sheet,c,coord,'')
 					coord+=1
 				batch2 = []
 			if len(avg) > 0:
 				cell_data(sheet,avg[1],coord)
-				cell_format(sheet,avg[1],coord,'ffbb543')
+				cell_format(sheet,avg[1],coord,'theme:0:-0.34998626667073579')
 				coord+=1
 			avg = []
 		sheet.column_dimensions['B'].width = 15
