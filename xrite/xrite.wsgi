@@ -72,7 +72,7 @@ def csv_to_xlsx(f,p):
 		for a in alpha:# data
 			for i in data:
 				if a == i[0]:
-					batch1.append([i[0]+str(i[1]),i[2]] + map(float,i[6:12]))# non-sum
+					batch1.append([i[0]+str(i[1]),i[2]] + map(float,i[7:13]))# non-sum
 					batch2.append([i[0]+str(i[1]),i[2]] + map(float,i[3:7]) + ['',''])# sum
 			if len(batch1) > 0:
 				avg.append([
