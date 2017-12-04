@@ -32,12 +32,13 @@ status = '200 OK'
 
 #---------------------------
 
-def cell_format(sheet,data,coord,color):
+def cell_format(sheet,data,coord,color = ''):
 	for i in range(1,len(data)+1):
 		xy = get_column_letter(i) + str(coord)
 		sheet.cell(xy).style.alignment.horizontal = 'center'
-		sheet.cell(xy).style.fill.fill_type = 'solid'
-		sheet.cell(xy).style.fill.start_color.index = color
+		if color:
+			sheet.cell(xy).style.fill.fill_type = 'solid'
+			sheet.cell(xy).style.fill.start_color.index = color
 		for side in ('top','bottom','left','right'):
 			getattr(sheet.cell(xy).style.borders,side).border_style = 'thin'
 			getattr(sheet.cell(xy).style.borders,side).color.index = '000000'
@@ -86,7 +87,7 @@ def csv_to_xlsx(f,p):
 				])
 				for b in batch1:
 					cell_data(sheet,b,coord)
-					cell_format(sheet,b,coord,'')
+					cell_format(sheet,b,coord)
 					coord+=1
 				batch1 = []
 			if len(avg) > 0:
@@ -104,7 +105,7 @@ def csv_to_xlsx(f,p):
 				])
 				for c in batch2:
 					cell_data(sheet,c,coord)
-					cell_format(sheet,c,coord,'')
+					cell_format(sheet,c,coord)
 					coord+=1
 				batch2 = []
 			if len(avg) > 0:
