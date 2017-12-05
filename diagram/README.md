@@ -24,11 +24,11 @@ FILE
   web/python-powerd.png - Python logo by Python.org
        web/diagram.wsgi - WSGI frontend.
 
-              diagram.r - Original R program.
-             diagram.py - Standalone Python program.
-ternary_axes_subplot.py - Corner label patch by ZGainsforth (c) 2016
-     diagram_screen.png - Output sreen.
-     python-ternary.zip - Ternary diagram library by Marc Harper (c) 2015 MIT
+                diagram.py - Standalone Python program.
+ternary_axes_subplot.patch - Corner label patch by ZGainsforth (c) 2016
+      ternary-1.0.1.tar.gz - Ternary diagram library by Marc Harper (c) 2015 MIT
+                 diagram.r - Original R program.
+        diagram_screen.png - Output sreen.
 </pre>
 CONTACT
 
