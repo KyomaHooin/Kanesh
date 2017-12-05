@@ -1,0 +1,98 @@
+--- ternary-1.0.1/ternary/ternary_axes_subplot.py	2017-12-05 23:21:01.774306082 +0100
++++ ternary_axes_subplot.py	2017-07-04 19:07:58.000000000 +0200
+@@ -137,6 +137,31 @@
+             position = (-offset, 3./5, 2./5)
+         self._labels["left"] = (label, position, rotation, kwargs)
+ 
++    def right_corner_label(self, label, position=None,  rotation=0, offset=0.08,
++                        **kwargs):
++        """
++        Sets the label on the right corner (complements left axis).
++
++        Parameters
++        ----------
++        ax: Matplotlib AxesSubplot, None
++            The subplot to draw on.
++        label: String
++            The axis label
++        position: 3-Tuple of floats, None
++            The position of the text label
++        rotation: float, 0
++            The angle of rotation of the label
++        offset: float,
++            Used to compute the distance of the label from the axis
++        kwargs:
++            Any kwargs to pass through to matplotlib.
++        """
++
++        if not position:
++            position = (1, offset, 0)
++        self._labels["right_corner"] = (label, position, rotation, kwargs)
++
+     def right_axis_label(self, label, position=None, rotation=-60, offset=0.08,
+                          **kwargs):
+         """
+@@ -162,6 +187,31 @@
+             position = (2./5 + offset, 3./5, 0)
+         self._labels["right"] = (label, position, rotation, kwargs)
+ 
++    def left_corner_label(self, label, position=None, rotation=-0, offset=0.08,
++                         **kwargs):
++        """
++        Sets the label on the left corner (complements right axis.)
++
++        Parameters
++        ----------
++        ax: Matplotlib AxesSubplot, None
++            The subplot to draw on.
++        label: String
++            The axis label
++        position: 3-Tuple of floats, None
++            The position of the text label
++        rotation: float, 0
++            The angle of rotation of the label
++        offset: float,
++            Used to compute the distance of the label from the axis
++        kwargs:
++            Any kwargs to pass through to matplotlib.
++        """
++
++        if not position:
++            position = (-offset, offset, -offset/2)
++        self._labels["left_corner"] = (label, position, rotation, kwargs)
++
+     def bottom_axis_label(self, label, position=None, rotation=0, offset=0.02,
+                           **kwargs):
+         """
+@@ -187,6 +237,31 @@
+             position = (1./2, offset, 1./2)
+         self._labels["bottom"] = (label, position, rotation, kwargs)
+ 
++    def top_corner_label(self, label, position=None, rotation=0, offset=0.2,
++                          **kwargs):
++        """
++        Sets the label on the bottom axis.
++
++        Parameters
++        ----------
++        ax: Matplotlib AxesSubplot, None
++            The subplot to draw on.
++        label: String
++            The axis label
++        position: 3-Tuple of floats, None
++            The position of the text label
++        rotation: float, 0
++            The angle of rotation of the label
++        offset: float,
++            Used to compute the distance of the label from the axis
++        kwargs:
++            Any kwargs to pass through to matplotlib.
++        """
++
++        if not position:
++            position = (-offset/2,1+offset,0)
++        self._labels["top_corner"] = (label, position, rotation, kwargs)
++
+     def annotate(self, text, position, **kwargs):
+         ax = self.get_axes()
+         p = project_point(position)
