@@ -1,0 +1,39 @@
+--- diagrams.py	2017-12-05 18:25:04.207463570 +0100
++++ colour-0.3.8/colour/plotting/diagrams.py	2017-12-05 18:24:57.106847825 +0100
+@@ -30,7 +30,6 @@
+ from colour.algebra import normalise_vector
+ from colour.colorimetry import spectral_to_XYZ
+ from colour.models import (
+-    Lab_to_XYZ,
+     Luv_to_uv,
+     Luv_uv_to_xy,
+     UCS_to_uv,
+@@ -503,7 +502,6 @@
+ 
+ 
+ def CIE_1976_UCS_chromaticity_diagram_plot(
+-        Lab_array,
+         cmfs='CIE 1931 2 Degree Standard Observer',
+         show_diagram_colours=True,
+         **kwargs):
+@@ -561,11 +559,6 @@
+                color='black',
+                linewidth=2)
+ 
+-    # plot Lab color
+-    for Lab in Lab_array: 
+-        Lab_uv = Luv_to_uv(XYZ_to_Luv(Lab_to_XYZ(Lab,illuminant),illuminant),illuminant)
+-       	pylab.plot(Lab_uv[0],Lab_uv[1],'+',color='black',markeredgewidth=1,markeredgecolor='black',markerfacecolor='none')
+-
+     for label in labels:
+         u, v = wavelengths_chromaticity_coordinates.get(label)
+         pylab.plot(u, v, 'o', color='black', linewidth=2)
+@@ -614,7 +607,7 @@
+         'x_label': 'CIE u\'',
+         'y_label': 'CIE v\'',
+         'grid': True,
+-        'bounding_box': (0.1, 0.4, 0.4, 0.7)})
++        'bounding_box': (0, 1, 0, 1)})
+     settings.update(kwargs)
+ 
+     boundaries(**settings)
