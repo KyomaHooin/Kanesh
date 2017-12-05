@@ -33,7 +33,7 @@ FILE
    web/color.png  - Logo by Colour Developers (c) 2013-2016
    web/color.wsgi - WSGI frontend.
 
-      diagrams.py - Modified library.
+   diagrams.patch - Lab to XYZ plot patch.
  color_screen.png - Web screenshot.
  colour-0.3.8.zip - Colour library by Colour Developers (c) 2013-2016
 </pre>
