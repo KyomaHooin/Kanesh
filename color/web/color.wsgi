@@ -17,7 +17,8 @@ html_head = """
 <img width="500" src="/media/color.png">
 <br><p style="padding-left: 42px;">[ Formát CSV: <b>ID;STD;L;a;b</b> ]</p>
 <form style="padding-left: 42px;" enctype="multipart/form-data" action="color" method="post">
-<b>Soubor CSV</b>: <input style="background-color:#ddd;" type="file" name="file"> <input type="submit" value="Export">
+<b>Soubor CSV</b>: <input style="background-color:#ddd;" type="file" name="file"><br><br>
+<input type="submit" value="Export">
 </form>
 """
 
