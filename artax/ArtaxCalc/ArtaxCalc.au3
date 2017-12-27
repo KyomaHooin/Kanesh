@@ -74,7 +74,7 @@ While 1
 				;create output file
 				$out = FileOpen(@ScriptDir & '\artax_calc_' & $runtime & ".csv", 258); UTF-8 no BOM overwrite
 				if @error then; write header
-					GUICtrlSetData($gui_error, "E: Nelze zapsat CSV soubor."))
+					GUICtrlSetData($gui_error, "E: Nelze zapsat CSV soubor.")
 				else;proccess CSV data
 					local $raw,$data,$batch[0][10],$data[1][10]
 					FileWriteLine($out, $header); CSV header
