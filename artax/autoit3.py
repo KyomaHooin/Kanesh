@@ -3,7 +3,7 @@
 # AutoIt3 linux wrapper
 #
 
-import subprocess,argparse,sys,os,re
+import subprocess,argparse,os,re
 
 BASE='/root/.wine/drive_c/Program Files (x86)/AutoIt3/'
 COMPILER='Aut2Exe/Aut2exe.exe'
