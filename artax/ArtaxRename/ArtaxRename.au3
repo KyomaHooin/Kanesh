@@ -19,9 +19,9 @@ $mapping = @ScriptDir & '\spectra.txt'
 If UBound(ProcessList(@ScriptName)) > 2 Then Exit
 
 ;GUI
-$gui = GUICreate("ArtaxRename v 1.1", 356, 91)
+$gui = GUICreate("ArtaxRename v 1.2", 356, 91)
 $gui_path = GUICtrlCreateInput("", 65, 8, 200, 21)
-$button_path = GUICtrlCreateButton("Prochazet", 275, 8, 75, 21)
+$button_path = GUICtrlCreateButton("Procházet", 275, 8, 75, 21)
 $gui_progress = GUICtrlCreateProgress(6, 38, 343, 16)
 $check_pro = GUICtrlCreateCheckbox("Projekt", 8, 8, 55, 21)
 $gui_error = GUICtrlCreateLabel("", 8, 65, 178, 15)
@@ -44,28 +44,28 @@ While 1
 		Local $map
 		_FileReadToArray($mapping, $map, 0)
 		If @error Then
-			GUICtrlSetData($gui_error, "Chyba: Nacteni seznamu selhalo.")
+			GUICtrlSetData($gui_error, "E: Načtení seznamu selhalo.")
 		ElseIf GUICtrlRead($gui_path) == '' Then
-			GUICtrlSetData($gui_error, "Chyba: Prazdna cesta.")
+			GUICtrlSetData($gui_error, "E: Prázdná cesta.")
 		ElseIf Not FileExists(GUICtrlRead($gui_path)) Then
-			GUICtrlSetData($gui_error, "Chyba: Adresar neexistuje.")
+			GUICtrlSetData($gui_error, "E: Adresář neexistuje.")
 		Else
 			if GUICtrlRead($check_pro) = $GUI_CHECKED then
 				$filelist = _FileListToArrayRec(GUICtrlRead($gui_path), '*.rtx', 1, 1, 1, 2) ; recursion, files only, sorted, fullpath..
 				If UBound($filelist) < 2 Then
-					GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
+					GUICtrlSetData($gui_error, "E: Adresář neobsahuje data.")
 				Else
 					For $i = 1 To UBound($filelist) - 1
 						GUICtrlSetData($gui_progress, Round($i / (UBound($filelist) - 1) * 100)) ; update progress
 						GUICtrlSetData($gui_error, StringRegExpReplace($filelist[$i], ".*\\(.*)$", "$1"))
 						_XMLLoadXML(FileRead($filelist[$i]))
 						if @error then
-							GUICtrlSetData($gui_error, "Chyba: Nacteni projektu selhalo.")
+							GUICtrlSetData($gui_error, "E: Načtení projektu selhalo.")
 							continueloop
 						else
 							$spectra_count = _XMLGetNodeCount('/TRTProject/ClassInstance/ChildClassInstances/ClassInstance')
 							if @error then
-								GUICtrlSetData($gui_error, "Chyba: Prazdny projektovy soubor.")
+								GUICtrlSetData($gui_error, "E: Prázdný projektový soubor.")
 								continueloop
 							Else
 								for $j = 1 to $spectra_count
@@ -79,7 +79,7 @@ While 1
 						endif
 						_XMLSaveDoc($filelist[$i])
 						if @error then
-							GUICtrlSetData($gui_error, "Chyba: Zapis projektu selhal.")
+							GUICtrlSetData($gui_error, "E: Zápis projektu selhal.")
 							continueloop
 						endif
 					next
@@ -89,7 +89,7 @@ While 1
 			Else
 				$filelist = _FileListToArrayRec(GUICtrlRead($gui_path), 'tab*.*', 1, 1, 1, 2) ; recursion, files only, sorted, fullpath..
 				If UBound($filelist) < 2 Then
-					GUICtrlSetData($gui_error, "Chyba: Adresar neobsahuje data.")
+					GUICtrlSetData($gui_error, "E: Adresář neobsahuje data.")
 				Else
 					For $i = 1 To UBound($filelist) - 1
 						GUICtrlSetData($gui_progress, Round($i / (UBound($filelist) - 1) * 100)) ; update progress
