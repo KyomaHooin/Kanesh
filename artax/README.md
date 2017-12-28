@@ -14,6 +14,7 @@ Artax_manual.odt - Program I/O manual.
 Artax_manual.pdf - Program I/O manual.
 artax_screen.png - Screenshot.
    spectragen.py - Tablet to ID CSV mapping generator.
+      autoit3.py - AutoIt3 linux wrapper.
      spectra.txt - Tablet to spectra ID map file.
        artax.ico - Program icon. 
 </pre>
