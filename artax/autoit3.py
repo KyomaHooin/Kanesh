@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# AutoIt3 linux wrapper
+# AutoIt3 linux wrapper.
 #
 
 import subprocess,argparse,os,re
@@ -13,9 +13,9 @@ WINE='/usr/bin/wine'
 #--------------
 
 parser = argparse.ArgumentParser()
-parser.add_argument("SRC")
-parser.add_argument("-c",action='store_true',default=False)
-parser.add_argument("-i","--ICO")
+parser.add_argument("SRC",help="Source AU3 file.")
+parser.add_argument("-c",help="Compile x86 executable.",action='store_true',default=False)
+parser.add_argument("-i","--ICO",help="Program icon file.")
 args = parser.parse_args()
 
 #--------------
