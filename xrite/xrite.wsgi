@@ -26,19 +26,21 @@ html_foot = """
 
 alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-header = ['č. měření','název standardu','ΔL*','Δa*','Δb*','ΔC*','ΔH*','ΔE*']
+header = ['č. vzorku','č. měření','název standardu','ΔL*','Δa*','Δb*','ΔC*','ΔH*','ΔE*']
 
 status = '200 OK'
 
 #---------------------------
 
-def cell_format(sheet,data,coord,color = ''):
+def cell_format(sheet,data,coord,color = '',merge = 0):
 	for i in range(1,len(data)+1):
 		xy = get_column_letter(i) + str(coord)
 		sheet.cell(xy).style.alignment.horizontal = 'center'
 		if color:
 			sheet.cell(xy).style.fill.fill_type = 'solid'
 			sheet.cell(xy).style.fill.start_color.index = color
+		if merge:
+			sheet.merge_cells('B' + str(coord) +':C' + str(coord))
 		for side in ('top','bottom','left','right'):
 			getattr(sheet.cell(xy).style.borders,side).border_style = 'thin'
 			getattr(sheet.cell(xy).style.borders,side).color.index = '000000'
@@ -73,17 +75,17 @@ def csv_to_xlsx(f,p):
 		for a in alpha:# data
 			for i in data:
 				if a == i[0]:
-					batch1.append([i[0]+str(i[1]),i[2]] + map(float,i[7:13]))# non-sum
-					batch2.append([i[0]+str(i[1]),i[2]] + map(float,i[3:7]) + ['',''])# sum
+					batch1.append(['',i[0]+str(i[1]),i[2]] + map(float,i[7:13]))# non-sum
+					batch2.append(['',i[0]+str(i[1]),i[2]] + map(float,i[3:7]) + ['',''])# sum
 			if len(batch1) > 0:
 				avg.append([
-					'','',
-					str(round(sum(zip(*batch1)[2])/len(batch1),1)),
+					'Průměrná hodnota','','',
 					str(round(sum(zip(*batch1)[3])/len(batch1),1)),
 					str(round(sum(zip(*batch1)[4])/len(batch1),1)),
 					str(round(sum(zip(*batch1)[5])/len(batch1),1)),
 					str(round(sum(zip(*batch1)[6])/len(batch1),1)),
-					str(round(sum(zip(*batch1)[7])/len(batch1),1))
+					str(round(sum(zip(*batch1)[7])/len(batch1),1)),
+					str(round(sum(zip(*batch1)[8])/len(batch1),1))
 				])
 				for b in batch1:
 					cell_data(sheet,b,coord)
@@ -92,15 +94,15 @@ def csv_to_xlsx(f,p):
 				batch1 = []
 			if len(avg) > 0:
 				cell_data(sheet,avg[0],coord)
-				cell_format(sheet,avg[0],coord,'theme:0:-0.34998626667073579')
+				cell_format(sheet,avg[0],coord,'theme:0:-0.34998626667073579',1)
 				coord+=1
 			if len(batch2) > 0:
 				avg.append([
-					'','',
-					str(round(sum(zip(*batch2)[2])/len(batch2),1)),
+					'Průměrná hodnota','','',
 					str(round(sum(zip(*batch2)[3])/len(batch2),1)),
 					str(round(sum(zip(*batch2)[4])/len(batch2),1)),
 					str(round(sum(zip(*batch2)[5])/len(batch2),1)),
+					str(round(sum(zip(*batch2)[6])/len(batch2),1)),
 					'',''
 				])
 				for c in batch2:
@@ -110,10 +112,11 @@ def csv_to_xlsx(f,p):
 				batch2 = []
 			if len(avg) > 0:
 				cell_data(sheet,avg[1],coord)
-				cell_format(sheet,avg[1],coord,'theme:0:-0.34998626667073579')
+				cell_format(sheet,avg[1],coord,'theme:0:-0.34998626667073579',1)
 				coord+=1
 			avg = []
-		sheet.column_dimensions['B'].width = 15
+		sheet.column_dimensions['A'].width = 19# tune
+		sheet.column_dimensions['C'].width = 16
 		book.save(p)
 		return '<b>ok</b>'
 	except:
