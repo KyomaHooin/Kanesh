@@ -7,7 +7,7 @@ Calculate mean and standard deviation from Bruker Artax 400 uXRF export data.
 FILE
 
 <pre>
-  ArtaxCalc.au3 - Main program
+  ArtaxCalc.au3 - Main program.
 calc_screen.png - Screenshot.
       artax.ico - Program icon. 
 </pre>
