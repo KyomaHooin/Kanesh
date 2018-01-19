@@ -13,7 +13,7 @@ WINE='/usr/bin/wine'
 #--------------
 
 parser = argparse.ArgumentParser()
-parser.add_argument("SRC",help="Source AU3 file.")
+parser.add_argument("SRC",help="Run source AU3 file.")
 parser.add_argument("-c",help="Compile x86 executable.",action='store_true',default=False)
 parser.add_argument("-i","--ICO",help="Program icon file.")
 args = parser.parse_args()
