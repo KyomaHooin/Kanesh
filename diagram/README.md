@@ -32,6 +32,5 @@ ternary_axes_subplot.patch - Corner label patch by ZGainsforth (c) 2016
 </pre>
 CONTACT
 
-Author: richard.bruna@protonmail.com<br>
 Source: https://github.com/KyomaHooin/Kanesh
 
