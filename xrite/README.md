@@ -33,7 +33,7 @@ FILE
 xrite.wsgi - WSGI frontend.
 </pre>
 
-CONTACT
+SOURCE
 
-Source: https://github.com/KyomaHooin/Kanesh
+https://github.com/KyomaHooin/Kanesh
 

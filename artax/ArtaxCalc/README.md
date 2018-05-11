@@ -12,7 +12,7 @@ calc_screen.png - Screenshot.
       artax.ico - Program icon. 
 </pre>
 
-CONTACT
+SOURCE
 
-Source: https://github.com/KyomaHooin/Kanesh
+https://github.com/KyomaHooin/Kanesh
 

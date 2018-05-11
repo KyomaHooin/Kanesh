@@ -40,7 +40,7 @@ FILE
 regress_screen.png - Output screenshot.
 </pre>
 
-CONTACT
+SOURCE
 
-Source: https://github.com/KyomaHooin/Kanesh
+https://github.com/KyomaHooin/Kanesh
 

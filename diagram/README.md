@@ -30,7 +30,7 @@ ternary_axes_subplot.patch - Corner label patch by ZGainsforth (c) 2016
                  diagram.r - Original R program.
         diagram_screen.png - Output sreen.
 </pre>
-CONTACT
+SOURCE
 
-Source: https://github.com/KyomaHooin/Kanesh
+https://github.com/KyomaHooin/Kanesh
 

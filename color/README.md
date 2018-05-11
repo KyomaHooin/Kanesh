@@ -38,7 +38,7 @@ FILE
  colour-0.3.8.zip - Colour library by Colour Developers (c) 2013-2016
 </pre>
 
-CONTACT
+SOURCE
 
-Source: https://github.com/KyomaHooin/Kanesh
+https://github.com/KyomaHooin/Kanesh
 

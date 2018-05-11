@@ -14,7 +14,7 @@ _XMLDomWrapper.au3 - XML library by Stephen Podhajecki.
          artax.ico - Program icon. 
 </pre>
 
-CONTACT
+SOURCE
 
-Source: https://github.com/KyomaHooin/Kanesh
+https://github.com/KyomaHooin/Kanesh
 

@@ -12,7 +12,7 @@ diagram/ - Ternary diagram Baycentric plot.
 regress/ - Linear regression plot & correlation coefficient.
   xrite/ - Parse X-Rite QCReport data.
 </pre>
-CONTACT
+SOURCE
 
-Source: https://github.com/KyomaHooin/Kanesh
+https://github.com/KyomaHooin/Kanesh
 
